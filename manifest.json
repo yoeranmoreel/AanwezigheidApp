@@ -1,13 +1,11 @@
 {
   "name": "Aanwezigheid Groenewoud",
   "short_name": "Groenewoud aanw",
-  "description": "Deze app is zodat het OT hun aanwezigheid op locatie GR kan aangeven, zodat collega's op de hoogte zijn van OT leden die aanwezig zijn in het gebouw.",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#2596be",
   "theme_color": "#2596be",
+  "description": "Deze app is zodat het OT hun aanwezigheid op locatie GR kan aangeven, zodat collega's op de hoogte zijn van OT leden die aanwezig zijn in het gebouw.",
   "icons": [
     {
       "src": "icons/icon-192x192.png",
