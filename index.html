@@ -1,35 +1,50 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aanwezigheid Systeem - Nissewijs</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { margin: 0; padding: 0; overflow-x: hidden; }
-        .gradient-bg {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-        }
-        .card-glow {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-glow:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 30px 60px rgba(79, 70, 229, 0.4);
-        }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); }
-        }
-        .status-indicator {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aanwezigheid Systeem - Nissewijs</title>
+
+  <!-- ✅ Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ PWA manifest + service worker registratie -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2596be">
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("✅ Service Worker geregistreerd"))
+        .catch(err => console.error("❌ Service Worker fout:", err));
+    }
+  </script>
+
+  <!-- ✅ Jouw bestaande styles -->
+  <style>
+    body { margin: 0; padding: 0; overflow-x: hidden; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+    }
+    .card-glow {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-glow:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(79, 70, 229, 0.4);
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.8); }
+    }
+    .status-indicator {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
 </head>
 <body class="gradient-bg min-h-screen text-white">
     <div class="max-w-7xl mx-auto p-6 md:p-8 pt-8 md:pt-12">
@@ -210,3 +225,4 @@
     </div>
 </body>
 </html>
+
