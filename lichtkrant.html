@@ -1,3 +1,5 @@
+https://script.google.com/macros/s/AKfycbyzFXPYSEAtirMfQFBK5xyz-1MjDf2xTkQyZm2Q3vMgiRggU8UwpghajcEvPlwZJuZV/exec
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -97,12 +99,22 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Ensure everything fits in viewport */
         .viewport-container {
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+        }
+
+        /* Gang mode specifieke styling */
+        .gang-mode .naam-text {
+            font-size: 1.5rem; /* Grotere tekst voor gang */
+        }
+
+        @media (min-width: 1024px) {
+            .gang-mode .naam-text {
+                font-size: 2rem; /* Nog groter op grote schermen */
+            }
         }
     </style>
 </head>
@@ -112,6 +124,10 @@
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzFXPYSEAtirMfQFBK5xyz-1MjDf2xTkQyZm2Q3vMgiRggU8UwpghajcEvPlwZJuZV/exec';
         const REFRESH_INTERVAL = 30000;
+        
+        // Check of we in gang mode zijn
+        const urlParams = new URLSearchParams(window.location.search);
+        const isGangMode = urlParams.get('mode') === 'gang';
 
         let currentTime = new Date();
         let medewerkers = [];
@@ -121,13 +137,12 @@
 
         function updateTime() {
             currentTime = new Date();
-            // Update alleen de tijd-elementen zonder hele pagina te re-renderen
             const timeElement = document.getElementById('current-time');
             const dateElement = document.getElementById('current-date');
             const statusElement = document.getElementById('status-time');
             
             if (timeElement) timeElement.textContent = formatTime(currentTime);
-            if (dateElement) timeElement = formatDate(currentTime);
+            if (dateElement) dateElement.textContent = formatDate(currentTime);
             if (statusElement) statusElement.textContent = formatTime(currentTime);
         }
 
@@ -212,24 +227,36 @@
             const statusData = getStatusData();
 
             app.innerHTML = `
-                <div class="gradient-bg viewport-container text-white">
+                <div class="gradient-bg viewport-container text-white ${isGangMode ? 'gang-mode' : ''}">
                     <div class="relative z-10 flex flex-col h-full p-4 sm:p-6 lg:p-8">
                         
                         <!-- Header -->
                         <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6 flex-shrink-0">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div class="flex items-center gap-3 sm:gap-4">
-                                    <!-- Terug knop -->
-                                    <a href="index.html" class="glass-card hover:bg-white/10 p-2 sm:p-3 rounded-xl border border-white/10 transition-all group">
-                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                        </svg>
-                                    </a>
-                                    <div class="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 p-2 sm:p-3 rounded-xl border border-blue-500/30">
-                                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                        </svg>
-                                    </div>
+                                    ${!isGangMode ? `
+                                        <!-- Terug knop (alleen lerarenkamer) -->
+                                        <a href="index.html" class="glass-card hover:bg-white/10 p-2 sm:p-3 rounded-xl border border-white/10 transition-all group">
+                                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                                            </svg>
+                                        </a>
+                                    ` : ''}
+                                    
+                                    ${isGangMode ? `
+                                        <!-- School logo (alleen gang) -->
+                                        <div class="bg-white/10 p-2 sm:p-3 rounded-xl border border-white/10">
+                                            <img src="assets/logo.png" alt="School Logo" class="h-12 sm:h-16 w-auto object-contain">
+                                        </div>
+                                    ` : `
+                                        <!-- Display icon (alleen lerarenkamer) -->
+                                        <div class="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 p-2 sm:p-3 rounded-xl border border-blue-500/30">
+                                            <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                    `}
+                                    
                                     <div>
                                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold">Aanwezigheid</h1>
                                         <p id="current-date" class="text-xs sm:text-sm lg:text-base text-slate-300">${formatDate(currentTime)}</p>
@@ -242,21 +269,23 @@
                         </div>
 
                         <!-- Content Grid -->
-                        <div class="grid ${mededelingen.length > 0 ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-4 sm:gap-6 flex-1 overflow-hidden">
+                        <div class="grid ${!isGangMode && mededelingen.length > 0 ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-4 sm:gap-6 flex-1 overflow-hidden">
                             
                             <!-- Aanwezigen -->
                             <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
-                                <div class="flex items-center justify-between mb-4 sm:mb-6 flex-shrink-0">
+                                <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'} mb-4 sm:mb-6 flex-shrink-0">
                                     <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2 sm:gap-3">
                                         <div class="w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full status-dot"></div>
-                                        Aanwezig
+                                        ${isGangMode ? 'Aanwezig Vandaag' : 'Aanwezig'}
                                     </h2>
-                                    <div class="glass-card px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl">
-                                        <span class="text-lg sm:text-xl lg:text-2xl font-bold text-green-400 tabular-nums">${statusData.present.length}</span>
-                                    </div>
+                                    ${!isGangMode ? `
+                                        <div class="glass-card px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl">
+                                            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-green-400 tabular-nums">${statusData.present.length}</span>
+                                        </div>
+                                    ` : ''}
                                 </div>
                                 
-                                <div class="space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2">
+                                <div class="space-y-2 sm:space-y-3 ${isGangMode ? 'lg:space-y-4' : ''} overflow-y-auto flex-1 pr-2">
                                     ${statusData.present.length === 0 
                                         ? `<div class="flex items-center justify-center h-full">
                                              <div class="text-center py-8 sm:py-12">
@@ -267,13 +296,13 @@
                                              </div>
                                            </div>`
                                         : statusData.present.map((person, index) => `
-                                            <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:bg-white/5 transition-all animate-fade-in" style="animation-delay: ${index * 50}ms">
-                                                <div class="flex items-center justify-between">
+                                            <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 ${isGangMode ? 'lg:p-6' : ''} hover:bg-white/5 transition-all animate-fade-in" style="animation-delay: ${index * 50}ms">
+                                                <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'}">
                                                     <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                                                        <div class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
-                                                        <span class="text-base sm:text-lg lg:text-xl font-semibold truncate">${person.naam}</span>
+                                                        <div class="w-2 h-2 ${isGangMode ? 'sm:w-3 sm:h-3' : ''} bg-green-400 rounded-full flex-shrink-0"></div>
+                                                        <span class="${isGangMode ? 'naam-text' : 'text-base sm:text-lg lg:text-xl'} font-semibold truncate">${person.naam}</span>
                                                     </div>
-                                                    ${person.tijd ? `
+                                                    ${!isGangMode && person.tijd ? `
                                                         <span class="text-xs sm:text-sm lg:text-base text-green-400 font-mono flex-shrink-0 ml-2">${person.tijd}</span>
                                                     ` : ''}
                                                 </div>
@@ -283,8 +312,8 @@
                                 </div>
                             </div>
 
-                            <!-- Mededelingen -->
-                            ${mededelingen.length > 0 ? `
+                            <!-- Mededelingen (alleen lerarenkamer) -->
+                            ${!isGangMode && mededelingen.length > 0 ? `
                                 <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
                                     <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-shrink-0">
                                         <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
