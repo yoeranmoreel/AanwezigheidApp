@@ -86,9 +86,9 @@
 
         /* Gang mode - automatisch schalen op aantal */
         .gang-mode .naam-text { font-size: 1.25rem; }
-        .gang-mode.klein .naam-text { font-size: 1.75rem; }
-        .gang-mode.middel .naam-text { font-size: 1.4rem; }
-        .gang-mode.groot .naam-text { font-size: 1.1rem; }
+        .gang-mode.klein .naam-text { font-size: 2.2rem; }
+        .gang-mode.middel .naam-text { font-size: 1.7rem; }
+        .gang-mode.groot .naam-text { font-size: 1.3rem; }
 
         @media (min-width: 1024px) {
             .gang-mode.klein .naam-text { font-size: 2.25rem; }
@@ -97,18 +97,31 @@
         }
 
         /* Dubbele kolom namen in gang mode */
-        .gang-mode .namen-lijst {
-            overflow: hidden !important;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            align-content: center;
-        }
+       .gang-mode .namen-lijst {
+    overflow: hidden !important;
+    display: grid;
+    gap: 0.5rem;
+    align-content: center;
+}
+
+.gang-mode.klein .namen-lijst {
+    grid-template-columns: 1fr;
+}
+
+.gang-mode.middel .namen-lijst,
+.gang-mode.groot .namen-lijst {
+    grid-template-columns: 1fr 1fr;
+}
 
         /* Kleinere padding in gang mode */
-        .gang-mode .naam-card { padding: 0.5rem 0.75rem !important; }
-        .gang-mode.klein .naam-card { padding: 0.75rem 1rem !important; }
+       .gang-mode .naam-card {
+        padding: 0.25rem 0.6rem !important;
+        min-height: unset !important;
+}
 
+.gang-mode.klein .naam-card {
+    padding: 0.35rem 0.8rem !important;
+}
         /* Header kleiner in gang mode */
         .gang-mode .gang-header { padding: 0.75rem 1rem !important; }
         .gang-mode .gang-header h1 { font-size: 1.5rem !important; }
@@ -143,8 +156,8 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzFXPYSEAtirMfQFBK5xyz-1MjDf2xTkQyZm2Q3vMgiRggU8UwpghajcEvPlwZJuZV/exec';
         const WEER_API_KEY = 'JOUW_OPENWEATHERMAP_API_KEY'; // ← Vervang dit!
         const POSTCODE = '3203BM';
-        const REFRESH_INTERVAL = 30000;
-        const WEER_REFRESH = 600000;   // 10 minuten
+        const REFRESH_INTERVAL = 60000;
+        const WEER_REFRESH = 6000000;   // 10 minuten
         const NIEUWS_REFRESH = 300000; // 5 minuten
 
         // ====================================
@@ -315,8 +328,20 @@
 
             const statusData = getStatusData();
 
+            let gangSizeClass = '';
+
+if (isGangMode) {
+    if (statusData.present.length <= 4) {
+        gangSizeClass = 'klein';
+    } else if (statusData.present.length <= 12) {
+        gangSizeClass = 'middel';
+    } else {
+        gangSizeClass = 'groot';
+    }
+}
+
             app.innerHTML = `
-                <div class="gradient-bg viewport-container text-white ${isGangMode ? 'gang-mode' : ''}">
+                <div class="gradient-bg viewport-container text-white ${isGangMode ? `gang-mode ${gangSizeClass}` : ''}">
                     <div class="relative z-10 flex flex-col h-full p-4 sm:p-6 lg:p-8 ${!isGangMode ? 'pb-2 sm:pb-2 lg:pb-2' : ''}">
 
                         <!-- Header -->
@@ -378,7 +403,7 @@
                                     ` : ''}
                                 </div>
 
-                                <div class="space-y-2 sm:space-y-3 ${isGangMode ? 'lg:space-y-4' : ''} overflow-y-auto flex-1 pr-2">
+                                <div class="${isGangMode ? 'namen-lijst flex-1' : 'space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2'}">
                                     ${statusData.present.length === 0
                                         ? `<div class="flex items-center justify-center h-full">
                                              <div class="text-center py-8 sm:py-12">
@@ -389,7 +414,7 @@
                                              </div>
                                            </div>`
                                         : statusData.present.map((person, index) => `
-                                            <div class="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 ${isGangMode ? 'lg:p-6' : ''} hover:bg-white/5 transition-all animate-fade-in" style="animation-delay: ${index * 50}ms">
+                                            <div class="glass-card naam-card rounded-xl sm:rounded-2xl p-3 sm:p-4 ${isGangMode ? 'lg:p-6' : ''} hover:bg-white/5 transition-all animate-fade-in" style="animation-delay: ${index * 50}ms">
                                                 <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'}">
                                                     <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                                                         <div class="w-2 h-2 ${isGangMode ? 'sm:w-3 sm:h-3' : ''} bg-green-400 rounded-full flex-shrink-0"></div>
