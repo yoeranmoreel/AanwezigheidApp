@@ -100,27 +100,18 @@
        .gang-mode .namen-lijst {
     overflow: hidden !important;
     display: grid;
-    gap: 0.5rem;
-    align-content: center;
-}
-
-.gang-mode.klein .namen-lijst {
-    grid-template-columns: 1fr;
-}
-
-.gang-mode.middel .namen-lijst,
-.gang-mode.groot .namen-lijst {
     grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    align-content: start;
 }
 
         /* Kleinere padding in gang mode */
-       .gang-mode .naam-card {
-        padding: 0.25rem 0.6rem !important;
-        min-height: unset !important;
-}
-
-.gang-mode.klein .naam-card {
-    padding: 0.35rem 0.8rem !important;
+      .gang-mode .naam-card {
+    padding-top: 0.1rem !important;
+    padding-bottom: 0.1rem !important;
+    padding-left: 0.6rem !important;
+    padding-right: 0.6rem !important;
+    min-height: unset !important;
 }
         /* Header kleiner in gang mode */
         .gang-mode .gang-header { padding: 0.75rem 1rem !important; }
@@ -154,11 +145,11 @@
         // CONFIGURATIE
         // ====================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzFXPYSEAtirMfQFBK5xyz-1MjDf2xTkQyZm2Q3vMgiRggU8UwpghajcEvPlwZJuZV/exec';
-        const WEER_API_KEY = 'JOUW_OPENWEATHERMAP_API_KEY'; // ← Vervang dit!
-        const POSTCODE = '3203BM';
+        const WEER_API_KEY = '2a4ded2a6691d223778f1e3c83335bc2'; 
+        const PLAATS = 'Spijkenisse';
         const REFRESH_INTERVAL = 60000;
-        const WEER_REFRESH = 6000000;   // 10 minuten
-        const NIEUWS_REFRESH = 300000; // 5 minuten
+        const WEER_REFRESH = 1800000;   // 30 minuten
+        const NIEUWS_REFRESH = 3600000; // 60 minuten
 
         // ====================================
         // STATE
@@ -216,7 +207,13 @@
                 aanwezigheid = aanwezigheidData.aanwezigheid || [];
                 mededelingen = mededelingenData.mededelingen || [];
                 loading = false;
-                render();
+
+                if (document.getElementById('aanwezigheid-lijst')) {
+                    updateAanwezigheidLijst();
+                } else {
+                    render();
+                }
+                
             } catch (error) {
                 console.error('Fetch error:', error);
                 loading = false;
@@ -241,6 +238,52 @@
             return { present };
         }
 
+        function updateAanwezigheidLijst() {
+    const statusData = getStatusData();
+
+    const container = document.getElementById('aanwezigheid-lijst');
+
+    if (!container) return;
+
+    const teller = document.getElementById('aanwezigheid-teller');
+
+    if (teller) {
+        teller.textContent = statusData.present.length;
+    }
+
+    container.innerHTML = statusData.present.length === 0
+        ? `
+            <div class="flex items-center justify-center h-full">
+                <div class="text-center py-8">
+                    <p class="text-slate-400 text-lg">Niemand aanwezig</p>
+                </div>
+            </div>
+        `
+        : statusData.present.map((person, index) => `
+            <div class="glass-card naam-card rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:bg-white/5 transition-all animate-fade-in"
+                 style="animation-delay:${index * 50}ms">
+
+                <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'}">
+
+                    <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+
+                        <span class="${isGangMode ? 'naam-text' : 'text-base sm:text-lg lg:text-xl'} font-semibold truncate">
+                            ${person.naam}
+                        </span>
+                    </div>
+
+                    ${
+                        !isGangMode && person.tijd
+                            ? `<span class="text-xs sm:text-sm lg:text-base text-green-400 font-mono flex-shrink-0 ml-2">${person.tijd}</span>`
+                            : ''
+                    }
+
+                </div>
+            </div>
+        `).join('');
+}
+
         // ====================================
         // WEER (alleen lerarenkamer)
         // ====================================
@@ -253,7 +296,7 @@
             }
             try {
                 const res = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?zip=${POSTCODE},NL&appid=${WEER_API_KEY}&units=metric&lang=nl`
+                    `https://api.openweathermap.org/data/2.5/weather?q=${PLAATS},nl&appid=${WEER_API_KEY}&units=metric&lang=nl`
                 );
                 const data = await res.json();
                 weer = {
@@ -398,12 +441,17 @@ if (isGangMode) {
                                     </h2>
                                     ${!isGangMode ? `
                                         <div class="glass-card px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl">
-                                            <span class="text-lg sm:text-xl lg:text-2xl font-bold text-green-400 tabular-nums">${statusData.present.length}</span>
+                                            <span id="aanwezigheid-teller" 
+                                                  class="text-lg sm:text-xl lg:text-2xl font-bold text-green-400 tabular-nums">
+                                                  ${statusData.present.length}
+                                                  </span>
                                         </div>
                                     ` : ''}
                                 </div>
 
-                                <div class="${isGangMode ? 'namen-lijst flex-1' : 'space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2'}">
+                                <div id="aanwezigheid-lijst"
+                                     class="${isGangMode ? 'namen-lijst flex-1' : 'space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2'}">
+                                    
                                     ${statusData.present.length === 0
                                         ? `<div class="flex items-center justify-center h-full">
                                              <div class="text-center py-8 sm:py-12">
