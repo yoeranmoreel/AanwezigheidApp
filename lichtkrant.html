@@ -85,29 +85,34 @@
         }
 
         /* Gang mode - automatisch schalen op aantal */
-        .gang-mode .naam-text { font-size: 1.5rem; }
-        .gang-mode.klein .naam-text { font-size: 2.5rem; }   /* 1-4 personen */
-        .gang-mode.middel .naam-text { font-size: 1.75rem; } /* 5-8 personen */
-        .gang-mode.groot .naam-text { font-size: 1.25rem; }  /* 9+ personen */
+        .gang-mode .naam-text { font-size: 1.25rem; }
+        .gang-mode.klein .naam-text { font-size: 1.75rem; }
+        .gang-mode.middel .naam-text { font-size: 1.4rem; }
+        .gang-mode.groot .naam-text { font-size: 1.1rem; }
 
         @media (min-width: 1024px) {
-            .gang-mode.klein .naam-text { font-size: 3.5rem; }
-            .gang-mode.middel .naam-text { font-size: 2.25rem; }
-            .gang-mode.groot .naam-text { font-size: 1.5rem; }
+            .gang-mode.klein .naam-text { font-size: 2.25rem; }
+            .gang-mode.middel .naam-text { font-size: 1.75rem; }
+            .gang-mode.groot .naam-text { font-size: 1.35rem; }
         }
 
-        /* Geen scroll in gang mode */
+        /* Dubbele kolom namen in gang mode */
         .gang-mode .namen-lijst {
             overflow: hidden !important;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            align-content: center;
         }
 
-        /* Padding aanpassen op aantal */
-        .gang-mode.klein .naam-card { padding: 1rem 1.5rem; }
-        .gang-mode.middel .naam-card { padding: 0.75rem 1.25rem; }
-        .gang-mode.groot .naam-card { padding: 0.5rem 1rem; }
+        /* Kleinere padding in gang mode */
+        .gang-mode .naam-card { padding: 0.5rem 0.75rem !important; }
+        .gang-mode.klein .naam-card { padding: 0.75rem 1rem !important; }
+
+        /* Header kleiner in gang mode */
+        .gang-mode .gang-header { padding: 0.75rem 1rem !important; }
+        .gang-mode .gang-header h1 { font-size: 1.5rem !important; }
+        .gang-mode .gang-header p { font-size: 0.75rem !important; }
 
         /* Nieuws ticker */
         .ticker-wrapper {
@@ -315,7 +320,7 @@
                     <div class="relative z-10 flex flex-col h-full p-4 sm:p-6 lg:p-8 ${!isGangMode ? 'pb-2 sm:pb-2 lg:pb-2' : ''}">
 
                         <!-- Header -->
-                        <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-5 flex-shrink-0">
+                        <div class="glass-card-strong rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex-shrink-0 ${isGangMode ? 'gang-header' : 'rounded-3xl p-6 mb-5'}">
                             <div class="flex items-center justify-between gap-4">
                                 <div class="flex items-center gap-3 sm:gap-4">
                                     ${!isGangMode ? `
