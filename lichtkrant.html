@@ -7,166 +7,112 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; padding: 0; overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #1a2e1a 0%, #2d4a1e 100%);
-            position: fixed;
-            inset: 0;
-        }
-        
-        .gradient-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(141, 198, 63, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(91, 163, 33, 0.12) 0%, transparent 50%);
-            pointer-events: none;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        
-        .glass-card-strong {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .loading-spinner {
-            border: 4px solid rgba(148, 163, 184, 0.3);
-            border-top: 4px solid #8dc63f;
-            border-radius: 50%;
-            width: 60px; height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+        body { margin: 0; padding: 0; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1a2e1a 0%, #2d4a1e 100%); position: fixed; inset: 0; }
+        .gradient-bg::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 50%, rgba(141, 198, 63, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(91, 163, 33, 0.12) 0%, transparent 50%); pointer-events: none; }
+        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+        .glass-card-strong { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); }
+        .loading-spinner { border: 4px solid rgba(148,163,184,0.3); border-top: 4px solid #8dc63f; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
-        
-        .status-dot {
-            animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.1); }
-        }
-        
+        .status-dot { animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.1); } }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+        .viewport-container { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .viewport-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Gang mode - automatisch schalen op aantal */
+        /* Gang mode */
         .gang-mode .naam-text { font-size: 1.25rem; }
         .gang-mode.klein .naam-text { font-size: 2.2rem; }
         .gang-mode.middel .naam-text { font-size: 1.7rem; }
         .gang-mode.groot .naam-text { font-size: 1.3rem; }
-
         @media (min-width: 1024px) {
             .gang-mode.klein .naam-text { font-size: 2.25rem; }
             .gang-mode.middel .naam-text { font-size: 1.75rem; }
             .gang-mode.groot .naam-text { font-size: 1.35rem; }
         }
-
-        /* Dubbele kolom namen in gang mode */
-       .gang-mode .namen-lijst {
-    overflow: hidden !important;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    align-content: start;
-}
-
-        /* Kleinere padding in gang mode */
-      .gang-mode .naam-card {
-    padding-top: 0.1rem !important;
-    padding-bottom: 0.1rem !important;
-    padding-left: 0.6rem !important;
-    padding-right: 0.6rem !important;
-    min-height: unset !important;
-}
-        /* Header kleiner in gang mode */
+        .gang-mode .namen-lijst { overflow: hidden !important; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-content: start; }
+        .gang-mode .naam-card { padding-top: 0.1rem !important; padding-bottom: 0.1rem !important; padding-left: 0.6rem !important; padding-right: 0.6rem !important; min-height: unset !important; }
         .gang-mode .gang-header { padding: 0.75rem 1rem !important; }
         .gang-mode .gang-header h1 { font-size: 1.5rem !important; }
         .gang-mode .gang-header p { font-size: 0.75rem !important; }
 
+        /* Lerarenkamer: grote namen zoals gangmode */
+        .lerarenkamer-mode .naam-text { font-size: 1.5rem; }
+        .lerarenkamer-mode.klein .naam-text { font-size: 2.2rem; }
+        .lerarenkamer-mode.middel .naam-text { font-size: 1.8rem; }
+        .lerarenkamer-mode.groot .naam-text { font-size: 1.5rem; }
+        @media (min-width: 1024px) {
+            .lerarenkamer-mode.klein .naam-text { font-size: 2.25rem; }
+            .lerarenkamer-mode.middel .naam-text { font-size: 1.85rem; }
+            .lerarenkamer-mode.groot .naam-text { font-size: 1.55rem; }
+        }
+        .lerarenkamer-mode .namen-lijst { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; align-content: start; overflow-y: auto; flex: 1; }
+        .lerarenkamer-mode .naam-card { padding-top: 0.2rem !important; padding-bottom: 0.2rem !important; padding-left: 0.6rem !important; padding-right: 0.6rem !important; }
+
         /* Nieuws ticker */
-        .ticker-wrapper {
-            overflow: hidden;
-            white-space: nowrap;
-            flex: 1;
-        }
-
-        .ticker-content {
-            display: inline-block;
-            animation: ticker 120s linear infinite;
-            white-space: nowrap;
-        }
-
-        @keyframes ticker {
-            0% { transform: translateX(30vw); }
-            100% { transform: translateX(-100%); }
-        }
+        .ticker-wrapper { overflow: hidden; white-space: nowrap; flex: 1; }
+        .ticker-content { display: inline-block; animation: ticker 120s linear infinite; white-space: nowrap; }
+        @keyframes ticker { 0% { transform: translateX(30vw); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
 <body>
     <div id="app"></div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, onSnapshot, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // ====================================
+        // FIREBASE CONFIG — vul jouw gegevens in
+        // ====================================
+          const firebaseConfig = {
+  	apiKey: "AIzaSyD9w-uzVhuvfIR5_UH-xcMKJPAlpx5fKRk",
+  	authDomain: "aanwezigheid-app.firebaseapp.com",
+  	projectId: "aanwezigheid-app",
+  	storageBucket: "aanwezigheid-app.firebasestorage.app",
+  	messagingSenderId: "188437676924",
+  	appId: "1:188437676924:web:194eb53f7c6eb40ec3daf9",
+  	measurementId: "G-V8WM335NFL"
+     };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         // ====================================
         // CONFIGURATIE
         // ====================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyzFXPYSEAtirMfQFBK5xyz-1MjDf2xTkQyZm2Q3vMgiRggU8UwpghajcEvPlwZJuZV/exec';
-        const WEER_API_KEY = '2a4ded2a6691d223778f1e3c83335bc2'; 
+        const WEER_API_KEY = '2a4ded2a6691d223778f1e3c83335bc2';
         const PLAATS = 'Spijkenisse';
-        const REFRESH_INTERVAL = 60000;
-        const WEER_REFRESH = 1800000;   // 30 minuten
-        const NIEUWS_REFRESH = 3600000; // 60 minuten
+        const WEER_REFRESH = 1800000;
+        const NIEUWS_REFRESH = 3600000;
+        // Pas aan naar jouw GitHub raw URL:
+        const VERJAARDAGEN_URL = 'https://raw.githubusercontent.com/yoeranmoreel/Aanwezigheidapp-Firebase-Test/main/verjaardagen.txt';
+
+        // ====================================
+        // MODE DETECTIE
+        // ====================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const isGangMode = urlParams.get('mode') === 'gang';
+        const isLerarenkamer = urlParams.get('mode') === 'lerarenkamer';
+        const showTijd = !isGangMode && !isLerarenkamer;
 
         // ====================================
         // STATE
         // ====================================
-        const urlParams = new URLSearchParams(window.location.search);
-        const isGangMode = urlParams.get('mode') === 'gang';
-
         let currentTime = new Date();
         let medewerkers = [];
         let aanwezigheid = [];
         let mededelingen = [];
+        let verjaardagen = []; // { dag, maand, naam }
         let loading = true;
         let weer = null;
         let nieuws = [];
 
         // ====================================
-        // TIJD
+        // TIJD HELPERS
         // ====================================
         function updateTime() {
             currentTime = new Date();
@@ -178,60 +124,120 @@
             if (statusEl) statusEl.textContent = formatTime(currentTime);
         }
 
-        function formatTime(date) {
-            return date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+        function formatTime(date) { return date.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }); }
+        function formatDate(date) { return date.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
+
+        // ====================================
+        // VERJAARDAGEN
+        // ====================================
+        async function fetchVerjaardagen() {
+            if (!isLerarenkamer) return;
+            try {
+                const res = await fetch(VERJAARDAGEN_URL + '?t=' + Date.now());
+                const text = await res.text();
+                verjaardagen = text.trim().split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0 && !line.startsWith('#'))
+                    .map(line => {
+                        const match = line.match(/^(\d{2})-(\d{2})\s+(.+)$/);
+                        if (!match) return null;
+                        return { dag: parseInt(match[1]), maand: parseInt(match[2]), naam: match[3].trim() };
+                    })
+                    .filter(Boolean);
+            } catch (e) {
+                console.warn('Verjaardagen niet geladen:', e);
+                verjaardagen = [];
+            }
         }
 
-        function formatDate(date) {
-            return date.toLocaleDateString('nl-NL', {
-                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        // Geeft verjaardagen terug die vandaag getoond moeten worden, met label
+        function getVerjaardagenVandaag() {
+            const vandaag = new Date();
+            const dagVanDeWeek = vandaag.getDay(); // 0=zo, 1=ma, ..., 5=vr, 6=za
+
+            return verjaardagen.filter(v => {
+                // Maak een Date object voor de verjaardag dit jaar
+                const vjDatum = new Date(vandaag.getFullYear(), v.maand - 1, v.dag);
+                const vjDag = vjDatum.getDay(); // dag van de week van de verjaardag
+
+                if (vjDag === 0) {
+                    // Zondag → toon op maandag
+                    const maandag = new Date(vjDatum);
+                    maandag.setDate(vjDatum.getDate() + 1);
+                    return vandaag.toDateString() === maandag.toDateString() ||
+                           vandaag.toDateString() === new Date(vjDatum.getTime() - 86400000 * 2).toDateString();
+                    // Ook vrijdag (2 dagen voor zondag)
+                } else if (vjDag === 6) {
+                    // Zaterdag → toon op vrijdag (dag ervoor) én maandag (2 dagen later)
+                    const vrijdag = new Date(vjDatum.getTime() - 86400000);
+                    const maandag = new Date(vjDatum.getTime() + 86400000 * 2);
+                    return vandaag.toDateString() === vrijdag.toDateString() ||
+                           vandaag.toDateString() === maandag.toDateString();
+                } else {
+                    // Werkdag → toon op de dag zelf
+                    return vandaag.toDateString() === vjDatum.toDateString();
+                }
+            }).map(v => {
+                const vjDatum = new Date(vandaag.getFullYear(), v.maand - 1, v.dag);
+                const vjDag = vjDatum.getDay();
+                let label = 'Vandaag jarig';
+                if (vjDag === 6) label = 'Zaterdag jarig';
+                if (vjDag === 0) label = 'Zondag jarig';
+                return { ...v, label };
             });
         }
 
         // ====================================
-        // AANWEZIGHEID DATA
+        // FIREBASE DATA
         // ====================================
-        async function fetchData() {
-            try {
-                const [medewerkersRes, aanwezigheidRes, mededelingenRes] = await Promise.all([
-                    fetch(`${API_URL}?action=getMedewerkers`),
-                    fetch(`${API_URL}?action=getAanwezigheid`),
-                    fetch(`${API_URL}?action=getMededelingen`)
-                ]);
-                const [medewerkersData, aanwezigheidData, mededelingenData] = await Promise.all([
-                    medewerkersRes.json(),
-                    aanwezigheidRes.json(),
-                    mededelingenRes.json()
-                ]);
-                medewerkers = medewerkersData.medewerkers || [];
-                aanwezigheid = aanwezigheidData.aanwezigheid || [];
-                mededelingen = mededelingenData.mededelingen || [];
+        async function init() {
+            const now = new Date();
+            const startVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const eindeVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+            // Medewerkers en mededelingen: eenmalig laden
+            const mededelingenQuery = query(collection(db, 'mededelingen'), where('actief', '==', true));
+            const [medSnap, meddSnap] = await Promise.all([
+                getDocs(collection(db, 'medewerkers')),
+                getDocs(mededelingenQuery)
+            ]);
+            medewerkers = medSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(m => m.naam);
+            mededelingen = meddSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // Aanwezigheid: realtime via onSnapshot — geen polling, geen knipperen
+            const aanwezigheidQuery = query(
+                collection(db, 'aanwezigheid'),
+                where('datum', '>=', Timestamp.fromDate(startVanDag)),
+                where('datum', '<', Timestamp.fromDate(eindeVanDag))
+            );
+
+            onSnapshot(aanwezigheidQuery, (snapshot) => {
+                aanwezigheid = snapshot.docs.map(d => ({
+                    id: d.id,
+                    ...d.data(),
+                    tijdstip: d.data().tijdstip?.toDate()
+                }));
                 loading = false;
 
+                // Alleen de namenlijst updaten, niet de hele pagina herschrijven
                 if (document.getElementById('aanwezigheid-lijst')) {
                     updateAanwezigheidLijst();
                 } else {
                     render();
                 }
-                
-            } catch (error) {
-                console.error('Fetch error:', error);
-                loading = false;
-                render();
-            }
+            });
         }
 
         function getStatusData() {
-            const zichtbareMedewerkers = medewerkers.filter(m => m.zichtbaar);
             const present = [];
-            zichtbareMedewerkers.forEach(medewerker => {
+            medewerkers.filter(m => m.zichtbaar).forEach(medewerker => {
                 const statusEntry = aanwezigheid.find(a => a.naam === medewerker.naam);
                 if (statusEntry && statusEntry.status === 'Aanwezig') {
                     present.push({
                         naam: medewerker.naam,
-                        tijd: statusEntry.tijdstip ? new Date(statusEntry.tijdstip).toLocaleTimeString('nl-NL', {
-                            hour: '2-digit', minute: '2-digit'
-                        }) : null
+                        tijd: statusEntry.tijdstip
+                            ? statusEntry.tijdstip.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
+                            : null
                     });
                 }
             });
@@ -239,74 +245,45 @@
         }
 
         function updateAanwezigheidLijst() {
-    const statusData = getStatusData();
+            const statusData = getStatusData();
+            const container = document.getElementById('aanwezigheid-lijst');
+            if (!container) return;
+            const teller = document.getElementById('aanwezigheid-teller');
+            if (teller) teller.textContent = statusData.present.length;
+            container.innerHTML = renderNamenLijst(statusData.present);
+        }
 
-    const container = document.getElementById('aanwezigheid-lijst');
-
-    if (!container) return;
-
-    const teller = document.getElementById('aanwezigheid-teller');
-
-    if (teller) {
-        teller.textContent = statusData.present.length;
-    }
-
-    container.innerHTML = statusData.present.length === 0
-        ? `
-            <div class="flex items-center justify-center h-full">
-                <div class="text-center py-8">
-                    <p class="text-slate-400 text-lg">Niemand aanwezig</p>
-                </div>
-            </div>
-        `
-        : statusData.present.map((person, index) => `
-            <div class="glass-card naam-card rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:bg-white/5 transition-all animate-fade-in"
-                 style="animation-delay:${index * 50}ms">
-
-                <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'}">
-
-                    <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
-
-                        <span class="${isGangMode ? 'naam-text' : 'text-base sm:text-lg lg:text-xl'} font-semibold truncate">
-                            ${person.naam}
-                        </span>
+        function renderNamenLijst(present) {
+            if (present.length === 0) {
+                return `<div class="flex items-center justify-center h-full"><div class="text-center py-8 sm:py-12">
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <p class="text-slate-400 text-base sm:text-lg lg:text-xl">Niemand aanwezig</p>
+                </div></div>`;
+            }
+            return present.map((person, index) => `
+                <div class="glass-card naam-card rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:bg-white/5 transition-all animate-fade-in" style="animation-delay:${index * 50}ms">
+                    <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'}">
+                        <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                            <div class="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                            <span class="${(isGangMode || isLerarenkamer) ? 'naam-text' : 'text-base sm:text-lg lg:text-xl'} font-semibold truncate">${person.naam}</span>
+                        </div>
+                        ${showTijd && person.tijd ? `<span class="text-xs sm:text-sm lg:text-base text-green-400 font-mono flex-shrink-0 ml-2">${person.tijd}</span>` : ''}
                     </div>
-
-                    ${
-                        !isGangMode && person.tijd
-                            ? `<span class="text-xs sm:text-sm lg:text-base text-green-400 font-mono flex-shrink-0 ml-2">${person.tijd}</span>`
-                            : ''
-                    }
-
                 </div>
-            </div>
-        `).join('');
-}
+            `).join('');
+        }
 
         // ====================================
-        // WEER (alleen lerarenkamer)
+        // WEER & NIEUWS
         // ====================================
         async function fetchWeer() {
             if (isGangMode) return;
-            if (WEER_API_KEY === 'JOUW_OPENWEATHERMAP_API_KEY') {
-                weer = { temp: '--', omschrijving: 'API key ontbreekt', icon: '❓' };
-                render();
-                return;
-            }
             try {
-                const res = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?q=${PLAATS},nl&appid=${WEER_API_KEY}&units=metric&lang=nl`
-                );
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${PLAATS},nl&appid=${WEER_API_KEY}&units=metric&lang=nl`);
                 const data = await res.json();
-                weer = {
-                    temp: Math.round(data.main.temp),
-                    omschrijving: data.weather[0].description,
-                    icon: getWeerIcon(data.weather[0].id)
-                };
+                weer = { temp: Math.round(data.main.temp), omschrijving: data.weather[0].description, icon: getWeerIcon(data.weather[0].id) };
                 render();
-            } catch (error) {
-                console.error('Weer fetch error:', error);
+            } catch {
                 weer = { temp: '--', omschrijving: 'Geen data', icon: '❓' };
                 render();
             }
@@ -320,25 +297,18 @@
             if (id >= 700 && id < 800) return '🌫️';
             if (id === 800) return '☀️';
             if (id === 801) return '🌤️';
-            if (id >= 802 && id < 900) return '☁️';
+            if (id >= 802) return '☁️';
             return '🌡️';
         }
 
-        // ====================================
-        // NIEUWS RSS (alleen lerarenkamer)
-        // ====================================
         async function fetchNieuws() {
             if (isGangMode) return;
             try {
                 const rssUrl = encodeURIComponent('https://feeds.nos.nl/nosnieuwsalgemeen');
                 const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=10`);
                 const data = await res.json();
-                if (data.status === 'ok') {
-                    nieuws = data.items.map(item => item.title);
-                    updateTicker();
-                }
-            } catch (error) {
-                console.error('Nieuws fetch error:', error);
+                if (data.status === 'ok') { nieuws = data.items.map(item => item.title); updateTicker(); }
+            } catch {
                 nieuws = ['Nieuws tijdelijk niet beschikbaar'];
                 updateTicker();
             }
@@ -346,48 +316,133 @@
 
         function updateTicker() {
             const ticker = document.getElementById('nieuws-ticker');
-            if (ticker && nieuws.length > 0) {
-                ticker.textContent = nieuws.join('   •   ');
-            }
+            if (ticker && nieuws.length > 0) ticker.textContent = nieuws.join('   •   ');
+        }
+
+        // ====================================
+        // VERJAARDAG BLOK HTML
+        // ====================================
+        function renderVerjaardagenBlok(groot = false) {
+            const vjVandaag = getVerjaardagenVandaag();
+            if (vjVandaag.length === 0) return '';
+
+            const grootStyle = groot ? 'text-3xl sm:text-4xl lg:text-5xl' : 'text-base sm:text-lg lg:text-xl';
+            const labelStyle = groot ? 'text-lg sm:text-xl lg:text-2xl' : 'text-xs sm:text-sm';
+
+            return `
+                <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
+                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                        🎂 Verjaardag
+                    </h2>
+                    <div class="space-y-3 sm:space-y-4 overflow-y-auto flex-1">
+                        ${vjVandaag.map((v, i) => `
+                            <div class="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 animate-fade-in" style="animation-delay:${i * 80}ms">
+                                <p class="${labelStyle} font-semibold text-yellow-300 mb-1">${v.label}</p>
+                                <p class="${grootStyle} font-bold">${v.naam}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
         }
 
         // ====================================
         // RENDER
         // ====================================
         function render() {
-            const app = document.getElementById('app');
+            const appEl = document.getElementById('app');
 
             if (loading) {
-                app.innerHTML = `
-                    <div class="gradient-bg flex items-center justify-center">
-                        <div class="text-center">
-                            <div class="loading-spinner mx-auto mb-6"></div>
-                            <p class="text-white text-xl">Gegevens laden...</p>
-                        </div>
-                    </div>
-                `;
+                appEl.innerHTML = `<div class="gradient-bg flex items-center justify-center"><div class="text-center"><div class="loading-spinner mx-auto mb-6"></div><p class="text-white text-xl">Gegevens laden...</p></div></div>`;
                 return;
             }
 
             const statusData = getStatusData();
+            const vjVandaag = isLerarenkamer ? getVerjaardagenVandaag() : [];
+            const heeftMededelingen = !isGangMode && mededelingen.length > 0;
+            const heeftVerjaardagen = vjVandaag.length > 0;
 
+            // Lerarenkamer grootte voor namen
+            let lkSizeClass = '';
+            if (isLerarenkamer) {
+                if (statusData.present.length <= 4) lkSizeClass = 'klein';
+                else if (statusData.present.length <= 12) lkSizeClass = 'middel';
+                else lkSizeClass = 'groot';
+            }
+
+            // Gang grootte
             let gangSizeClass = '';
+            if (isGangMode) {
+                if (statusData.present.length <= 4) gangSizeClass = 'klein';
+                else if (statusData.present.length <= 12) gangSizeClass = 'middel';
+                else gangSizeClass = 'groot';
+            }
 
-if (isGangMode) {
-    if (statusData.present.length <= 4) {
-        gangSizeClass = 'klein';
-    } else if (statusData.present.length <= 12) {
-        gangSizeClass = 'middel';
-    } else {
-        gangSizeClass = 'groot';
-    }
-}
+            // Bepaal grid layout voor lerarenkamer
+            // Rechterkolom: mededelingen bovenaan, verjaardagen eronder (of groot als alleen verjaardagen)
+            let gridCols = 'lg:grid-cols-1';
+            let rechterKolom = '';
 
-            app.innerHTML = `
-                <div class="gradient-bg viewport-container text-white ${isGangMode ? `gang-mode ${gangSizeClass}` : ''}">
+            if (isLerarenkamer) {
+                if (heeftMededelingen || heeftVerjaardagen) {
+                    gridCols = 'lg:grid-cols-2';
+                    if (heeftMededelingen && heeftVerjaardagen) {
+                        // Mededelingen boven, verjaardagen onder in rechterkolom
+                        rechterKolom = `
+                            <div class="flex flex-col gap-4 sm:gap-5 overflow-hidden">
+                                <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in flex-1">
+                                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                        </svg>
+                                        Mededelingen
+                                    </h2>
+                                    <div class="space-y-3 sm:space-y-4 overflow-y-auto flex-1 pr-2">
+                                        ${renderMededelingen()}
+                                    </div>
+                                </div>
+                                ${renderVerjaardagenBlok(false)}
+                            </div>`;
+                    } else if (heeftMededelingen) {
+                        // Alleen mededelingen, geen verjaardagen
+                        rechterKolom = `
+                            <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
+                                <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                    </svg>
+                                    Mededelingen
+                                </h2>
+                                <div class="space-y-3 sm:space-y-4 overflow-y-auto flex-1 pr-2">
+                                    ${renderMededelingen()}
+                                </div>
+                            </div>`;
+                    } else {
+                        // Alleen verjaardagen, groot blok
+                        rechterKolom = renderVerjaardagenBlok(true);
+                    }
+                }
+            } else if (!isGangMode && heeftMededelingen) {
+                // Normale lichtkrant met mededelingen
+                gridCols = 'lg:grid-cols-2';
+                rechterKolom = `
+                    <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
+                        <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                            </svg>
+                            Mededelingen
+                        </h2>
+                        <div class="space-y-3 sm:space-y-4 overflow-y-auto flex-1 pr-2">
+                            ${renderMededelingen()}
+                        </div>
+                    </div>`;
+            }
+
+            appEl.innerHTML = `
+                <div class="gradient-bg viewport-container text-white ${isGangMode ? `gang-mode ${gangSizeClass}` : ''} ${isLerarenkamer ? `lerarenkamer-mode ${lkSizeClass}` : ''}">
                     <div class="relative z-10 flex flex-col h-full p-4 sm:p-6 lg:p-8 ${!isGangMode ? 'pb-2 sm:pb-2 lg:pb-2' : ''}">
 
-                        <!-- Header -->
+                        <!-- HEADER -->
                         <div class="glass-card-strong rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 flex-shrink-0 ${isGangMode ? 'gang-header' : 'rounded-3xl p-6 mb-5'}">
                             <div class="flex items-center justify-between gap-4">
                                 <div class="flex items-center gap-3 sm:gap-4">
@@ -412,8 +467,6 @@ if (isGangMode) {
                                         <p id="current-date" class="text-xs sm:text-sm lg:text-base text-slate-300">${formatDate(currentTime)}</p>
                                     </div>
                                 </div>
-
-                                <!-- Rechts: tijd + weer (lerarenkamer) -->
                                 <div class="flex items-center gap-4 sm:gap-6">
                                     ${!isGangMode && weer ? `
                                         <div class="glass-card rounded-xl px-4 py-3 text-center hidden sm:block">
@@ -429,10 +482,10 @@ if (isGangMode) {
                             </div>
                         </div>
 
-                        <!-- Content Grid -->
-                        <div class="grid ${!isGangMode && mededelingen.length > 0 ? 'lg:grid-cols-2' : 'lg:grid-cols-1'} gap-4 sm:gap-5 flex-1 overflow-hidden">
+                        <!-- HOOFD GRID -->
+                        <div class="grid ${gridCols} gap-4 sm:gap-5 flex-1 overflow-hidden">
 
-                            <!-- Aanwezigen -->
+                            <!-- AANWEZIGEN -->
                             <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
                                 <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'} mb-4 sm:mb-6 flex-shrink-0">
                                     <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2 sm:gap-3">
@@ -441,117 +494,65 @@ if (isGangMode) {
                                     </h2>
                                     ${!isGangMode ? `
                                         <div class="glass-card px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl">
-                                            <span id="aanwezigheid-teller" 
-                                                  class="text-lg sm:text-xl lg:text-2xl font-bold text-green-400 tabular-nums">
-                                                  ${statusData.present.length}
-                                                  </span>
+                                            <span id="aanwezigheid-teller" class="text-lg sm:text-xl lg:text-2xl font-bold text-green-400 tabular-nums">${statusData.present.length}</span>
                                         </div>
                                     ` : ''}
                                 </div>
-
-                                <div id="aanwezigheid-lijst"
-                                     class="${isGangMode ? 'namen-lijst flex-1' : 'space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2'}">
-                                    
-                                    ${statusData.present.length === 0
-                                        ? `<div class="flex items-center justify-center h-full">
-                                             <div class="text-center py-8 sm:py-12">
-                                               <svg class="w-12 h-12 sm:w-16 sm:h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                               </svg>
-                                               <p class="text-slate-400 text-base sm:text-lg lg:text-xl">Niemand aanwezig</p>
-                                             </div>
-                                           </div>`
-                                        : statusData.present.map((person, index) => `
-                                            <div class="glass-card naam-card rounded-xl sm:rounded-2xl p-3 sm:p-4 ${isGangMode ? 'lg:p-6' : ''} hover:bg-white/5 transition-all animate-fade-in" style="animation-delay: ${index * 50}ms">
-                                                <div class="flex items-center ${isGangMode ? 'justify-center' : 'justify-between'}">
-                                                    <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                                                        <div class="w-2 h-2 ${isGangMode ? 'sm:w-3 sm:h-3' : ''} bg-green-400 rounded-full flex-shrink-0"></div>
-                                                        <span class="${isGangMode ? 'naam-text' : 'text-base sm:text-lg lg:text-xl'} font-semibold truncate">${person.naam}</span>
-                                                    </div>
-                                                    ${!isGangMode && person.tijd ? `
-                                                        <span class="text-xs sm:text-sm lg:text-base text-green-400 font-mono flex-shrink-0 ml-2">${person.tijd}</span>
-                                                    ` : ''}
-                                                </div>
-                                            </div>
-                                        `).join('')
-                                    }
+                                <div id="aanwezigheid-lijst" class="${isGangMode ? 'namen-lijst flex-1' : isLerarenkamer ? 'namen-lijst flex-1' : 'space-y-2 sm:space-y-3 overflow-y-auto flex-1 pr-2'}">
+                                    ${renderNamenLijst(statusData.present)}
                                 </div>
                             </div>
 
-                            <!-- Mededelingen (alleen lerarenkamer) -->
-                            ${!isGangMode && mededelingen.length > 0 ? `
-                                <div class="glass-card-strong rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 flex flex-col overflow-hidden animate-fade-in">
-                                    <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-                                        </svg>
-                                        Mededelingen
-                                    </h2>
-                                    <div class="space-y-3 sm:space-y-4 overflow-y-auto flex-1 pr-2">
-                                        ${mededelingen.map((m, index) => `
-                                            <div class="rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 ${
-                                                m.prioriteit === 'Hoog'
-                                                    ? 'bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30'
-                                                    : 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30'
-                                            } animate-fade-in" style="animation-delay: ${index * 100}ms">
-                                                ${m.prioriteit === 'Hoog' ? `
-                                                    <div class="flex items-center gap-2 mb-2">
-                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                                        </svg>
-                                                        <span class="text-xs sm:text-sm font-semibold text-red-300">BELANGRIJK</span>
-                                                    </div>
-                                                ` : ''}
-                                                <h3 class="text-base sm:text-lg lg:text-xl font-bold mb-2">${m.titel}</h3>
-                                                <p class="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed">${m.bericht}</p>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            ` : ''}
+                            <!-- RECHTERKOLOM -->
+                            ${rechterKolom}
                         </div>
 
-                        <!-- Nieuws ticker (alleen lerarenkamer) -->
+                        <!-- NIEUWS TICKER -->
                         ${!isGangMode ? `
                             <div class="glass-card rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 mt-3 sm:mt-4 flex-shrink-0 flex items-center gap-3">
                                 <div class="bg-green-500/20 border border-green-500/30 rounded-lg px-2 py-1 flex-shrink-0">
-                                    <span class="text-xs font-bold text-green-300 uppercase tracking-wide">NOS</span>
+                                    <span class="${isLerarenkamer ? 'text-sm' : 'text-xs'} font-bold text-green-300 uppercase tracking-wide">NOS</span>
                                 </div>
                                 <div class="ticker-wrapper">
-                                    <span id="nieuws-ticker" class="ticker-content text-xs sm:text-sm text-slate-300">
+                                    <span id="nieuws-ticker" class="ticker-content ${isLerarenkamer ? 'text-lg' : 'text-xs sm:text-sm'} text-slate-300">
                                         ${nieuws.length > 0 ? nieuws.join('   •   ') : 'Nieuws laden...'}
                                     </span>
                                 </div>
                             </div>
                         ` : ''}
 
-                        <!-- Status indicator -->
+                        <!-- STATUS BAR -->
                         <div class="glass-card rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 mt-2 flex-shrink-0">
                             <div class="flex items-center justify-center gap-2 text-xs text-slate-400">
                                 <div class="w-2 h-2 bg-green-400 rounded-full status-dot"></div>
                                 <span>Live updates • Laatste refresh: <span id="status-time">${formatTime(currentTime)}</span></span>
                             </div>
                         </div>
-
                     </div>
                 </div>
             `;
+        }
+
+        function renderMededelingen() {
+            return mededelingen.map((m, index) => `
+                <div class="rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 ${m.prioriteit === 'Hoog' ? 'bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30' : 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30'} animate-fade-in" style="animation-delay:${index * 100}ms">
+                    ${m.prioriteit === 'Hoog' ? `<div class="flex items-center gap-2 mb-2"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span class="text-xs sm:text-sm font-semibold text-red-300">BELANGRIJK</span></div>` : ''}
+                    <h3 class="text-base sm:text-lg lg:text-xl font-bold mb-2">${m.titel}</h3>
+                    <p class="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed">${m.bericht}</p>
+                </div>
+            `).join('');
         }
 
         // ====================================
         // INIT
         // ====================================
         setInterval(updateTime, 1000);
+        init();
+        fetchVerjaardagen();
 
-        // Aanwezigheid
-        fetchData();
-        setInterval(fetchData, REFRESH_INTERVAL);
-
-        // Weer & Nieuws alleen voor lerarenkamer
         if (!isGangMode) {
             fetchWeer();
             setInterval(fetchWeer, WEER_REFRESH);
-
             fetchNieuws();
             setInterval(fetchNieuws, NIEUWS_REFRESH);
         }
