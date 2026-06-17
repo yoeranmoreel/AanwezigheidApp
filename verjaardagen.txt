@@ -2,7 +2,60 @@
 # Formaat: DD-MM Volledige naam
 # Regels die beginnen met # worden genegeerd
 
-01-01 Jan Jansen
+
 17-06 Test Testersson
-14-02 Piet de Vries
-15-06 Marie Bakker
+
+04-01 Carmel
+25-01 Megan
+29-01 Anouk de Roodt
+30-01 Sascha
+
+17-02 Melanie
+24-02 José
+
+29-03 Gré
+
+01-04 Bianca
+03-04 Lindsay
+05-04 Dian
+06-04 Veronica
+13-04 Laila
+16-04 Tigo
+
+05-05 Lesley
+10-05 Kim Vingerling
+28-05 Yonca
+
+02-06 Wanda
+16-06 Imanda
+29-06 Jolien
+30-06 Nicola
+
+07-07 Rickey
+09-07 Alexandra
+10-07 Jolka
+24-07 Melissa
+
+03-08 Margriet
+04-08 Anouk Stougje
+12-08 Kim Hoenderkamp
+13-08 Angelique
+
+14-09 Sara
+15-09 Maaike
+27-09 Mirjam
+30-09 Barbara
+
+14-10 Esther
+15-10 Carola
+15-10 Yoeran
+
+13-11 Jamie
+21-111 Michelle
+
+01-12 Marit
+04-12 Reinier
+14-12 Linda
+28-12 Wendy
+
+
