@@ -2,7 +2,7 @@
 # Formaat: DD-MM Volledige naam
 # Regels die beginnen met # worden genegeerd
 
-17-06 Jan Jansen
+01-01 Jan Jansen
 17-06 Test Testersson
 14-02 Piet de Vries
 15-06 Marie Bakker
