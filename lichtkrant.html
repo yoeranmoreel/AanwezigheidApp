@@ -187,60 +187,104 @@
             });
         }
 
-        // ====================================
-        // FIREBASE DATA
-        // ====================================
-   const mededelingenQuery = query(
-    collection(db, 'mededelingen'),
-    where('actief', '==', true)
-);
+  
+// ====================================
+// FIREBASE DATA
+// ====================================
+async function init() {
 
-const medSnap = await getDocs(collection(db, 'medewerkers'));
+    const now = new Date();
+    const startVanDag = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
 
-medewerkers = medSnap.docs
-    .map(d => ({ id: d.id, ...d.data() }))
-    .filter(m => m.naam);
+    const eindeVanDag = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1
+    );
 
-onSnapshot(
-    mededelingenQuery,
-    (snapshot) => {
-        mededelingen = snapshot.docs.map(d => ({
-            id: d.id,
-            ...d.data()
-        }));
+    // Medewerkers laden
+    const medSnap = await getDocs(
+        collection(db, 'medewerkers')
+    );
 
-        if (!loading) {
-            render();
-        }
-    },
-    (error) => {
-        console.error('Mededelingen listener fout:', error);
-    }
-);
+    medewerkers = medSnap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(m => m.naam);
 
-            // Aanwezigheid: realtime via onSnapshot — geen polling, geen knipperen
-            const aanwezigheidQuery = query(
-                collection(db, 'aanwezigheid'),
-                where('datum', '>=', Timestamp.fromDate(startVanDag)),
-                where('datum', '<', Timestamp.fromDate(eindeVanDag))
+    // Mededelingen realtime
+    const mededelingenQuery = query(
+        collection(db, 'mededelingen'),
+        where('actief', '==', true)
+    );
+
+    onSnapshot(
+        mededelingenQuery,
+        (snapshot) => {
+            mededelingen = snapshot.docs.map(d => ({
+                id: d.id,
+                ...d.data()
+            }));
+
+            if (!loading) {
+                render();
+            }
+        },
+        (error) => {
+            console.error(
+                'Mededelingen listener fout:',
+                error
             );
-
-            onSnapshot(aanwezigheidQuery, (snapshot) => {
-                aanwezigheid = snapshot.docs.map(d => ({
-                    id: d.id,
-                    ...d.data(),
-                    tijdstip: d.data().tijdstip?.toDate()
-                }));
-                loading = false;
-
-                // Alleen de namenlijst updaten, niet de hele pagina herschrijven
-                if (document.getElementById('aanwezigheid-lijst')) {
-                    updateAanwezigheidLijst();
-                } else {
-                    render();
-                }
-            });
         }
+    );
+
+    // Aanwezigheid realtime
+    const aanwezigheidQuery = query(
+        collection(db, 'aanwezigheid'),
+        where(
+            'datum',
+            '>=',
+            Timestamp.fromDate(startVanDag)
+        ),
+        where(
+            'datum',
+            '<',
+            Timestamp.fromDate(eindeVanDag)
+        )
+    );
+
+    onSnapshot(
+        aanwezigheidQuery,
+        (snapshot) => {
+            aanwezigheid = snapshot.docs.map(d => ({
+                id: d.id,
+                ...d.data(),
+                tijdstip: d.data().tijdstip?.toDate()
+            }));
+
+            loading = false;
+
+            if (
+                document.getElementById(
+                    'aanwezigheid-lijst'
+                )
+            ) {
+                updateAanwezigheidLijst();
+            } else {
+                render();
+            }
+        },
+        (error) => {
+            console.error(
+                'Aanwezigheid listener fout:',
+                error
+            );
+        }
+    );
+}
 
         function getStatusData() {
             const present = [];
@@ -557,10 +601,8 @@ onSnapshot(
             `).join('');
         }
 
-        // ====================================
-        // INIT
-        // ====================================
-       // ====================================
+   
+// ====================================
 // INIT
 // ====================================
 setInterval(updateTime, 1000);
