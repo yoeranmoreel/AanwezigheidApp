@@ -144,6 +144,8 @@
                         return { dag: parseInt(match[1]), maand: parseInt(match[2]), naam: match[3].trim() };
                     })
                     .filter(Boolean);
+
+                render();
             } catch (e) {
                 console.warn('Verjaardagen niet geladen:', e);
                 verjaardagen = [];
