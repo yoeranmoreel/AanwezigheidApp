@@ -190,19 +190,33 @@
         // ====================================
         // FIREBASE DATA
         // ====================================
-        async function init() {
-            const now = new Date();
-            const startVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const eindeVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+   const mededelingenQuery = query(
+    collection(db, 'mededelingen'),
+    where('actief', '==', true)
+);
 
-            // Medewerkers en mededelingen: eenmalig laden
-            const mededelingenQuery = query(collection(db, 'mededelingen'), where('actief', '==', true));
-            const [medSnap, meddSnap] = await Promise.all([
-                getDocs(collection(db, 'medewerkers')),
-                getDocs(mededelingenQuery)
-            ]);
-            medewerkers = medSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(m => m.naam);
-            mededelingen = meddSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+const medSnap = await getDocs(collection(db, 'medewerkers'));
+
+medewerkers = medSnap.docs
+    .map(d => ({ id: d.id, ...d.data() }))
+    .filter(m => m.naam);
+
+onSnapshot(
+    mededelingenQuery,
+    (snapshot) => {
+        mededelingen = snapshot.docs.map(d => ({
+            id: d.id,
+            ...d.data()
+        }));
+
+        if (!loading) {
+            render();
+        }
+    },
+    (error) => {
+        console.error('Mededelingen listener fout:', error);
+    }
+);
 
             // Aanwezigheid: realtime via onSnapshot — geen polling, geen knipperen
             const aanwezigheidQuery = query(
@@ -546,16 +560,47 @@
         // ====================================
         // INIT
         // ====================================
-        setInterval(updateTime, 1000);
-        init();
-        fetchVerjaardagen();
+       // ====================================
+// INIT
+// ====================================
+setInterval(updateTime, 1000);
+init();
+fetchVerjaardagen();
 
-        if (!isGangMode) {
-            fetchWeer();
-            setInterval(fetchWeer, WEER_REFRESH);
-            fetchNieuws();
-            setInterval(fetchNieuws, NIEUWS_REFRESH);
+function scheduleReloads() {
+    const tijden = [
+        { uur: 0, minuut: 30 },
+        { uur: 7, minuut: 0 }
+    ];
+
+    tijden.forEach(tijd => {
+        const now = new Date();
+
+        const next = new Date();
+        next.setHours(tijd.uur, tijd.minuut, 0, 0);
+
+        if (next <= now) {
+            next.setDate(next.getDate() + 1);
         }
+
+        setTimeout(() => {
+            console.log(
+                `Automatische refresh ${tijd.uur}:${String(tijd.minuut).padStart(2, '0')}`
+            );
+
+            location.reload();
+        }, next.getTime() - now.getTime());
+    });
+}
+
+scheduleReloads();
+
+if (!isGangMode) {
+    fetchWeer();
+    setInterval(fetchWeer, WEER_REFRESH);
+    fetchNieuws();
+    setInterval(fetchNieuws, NIEUWS_REFRESH);
+}
     </script>
 </body>
 </html>
