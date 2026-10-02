@@ -48,7 +48,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const ADMIN_EMAIL = 'meesteryoeran@gmail.com';
 
         // ====================================
         // STATE
@@ -245,7 +244,7 @@
                                 <p class="text-slate-400 text-sm sm:text-base">Selecteer je naam om verder te gaan</p>
                             </div>
                             <div class="space-y-3">
-                                <button onclick="window._adminFns.setAdmin('Yoeran Moreel', '${ADMIN_EMAIL}')"
+                                <button onclick="window._adminFns.setAdmin('Yoeran Moreel', 'geautoriseerd beheer')"
                                     class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-xl hover:from-purple-700 hover:to-pink-700 transition text-base sm:text-lg font-semibold">
                                     Yoeran Moreel
                                 </button>
@@ -255,7 +254,7 @@
                                     <svg class="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                     </svg>
-                                    <p class="text-xs sm:text-sm text-slate-300"><strong class="text-white">Beveiligd:</strong> Alleen toegankelijk voor ${ADMIN_EMAIL}</p>
+                                    <p class="text-xs sm:text-sm text-slate-300"><strong class="text-white">Beveiligd:</strong> Alleen toegankelijk voor geautoriseerd beheer</p>
                                 </div>
                             </div>
                         </div>
