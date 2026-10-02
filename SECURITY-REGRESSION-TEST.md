@@ -26,7 +26,7 @@ Daarna dezelfde autorisatietests per rol:
 - `display-gang`: mag alleen algemene medewerkersgegevens en actuele status lezen.
 - `display-lerarenkamer`: mag daarnaast mededelingen en verjaardagen lezen.
 - `staff`: mag algemene medewerkers/status/interne extra's lezen en actuele status wijzigen.
-- admin `meesteryoeran@gmail.com`: mag beheerdata en beheeracties uitvoeren.
+- `admin`: mag beheerdata en beheeracties uitvoeren.
 
 ## Belangrijk
 
