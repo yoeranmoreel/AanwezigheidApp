@@ -94,7 +94,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isGangMode = urlParams.get('mode') === 'gang';
         const isLerarenkamer = urlParams.get('mode') === 'lerarenkamer';
-        const showTijd = !isGangMode && !isLerarenkamer;
+        const showTijd = false;
 
         // ====================================
         // STATE
@@ -287,7 +287,7 @@ async function init() {
         // WEER & NIEUWS
         // ====================================
         async function fetchWeer() {
-            if (isGangMode) return;
+            if (!isLerarenkamer || !WEER_API_KEY) return;
             try {
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${PLAATS},nl&appid=${WEER_API_KEY}&units=metric&lang=nl`);
                 const data = await res.json();
@@ -312,7 +312,7 @@ async function init() {
         }
 
         async function fetchNieuws() {
-            if (isGangMode) return;
+            if (!isLerarenkamer) return;
             try {
                 const rssUrl = encodeURIComponent('https://feeds.nos.nl/nosnieuwsalgemeen');
                 const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=10`);
@@ -368,7 +368,7 @@ async function init() {
 
             const statusData = getStatusData();
             const vjVandaag = isLerarenkamer ? getVerjaardagenVandaag() : [];
-            const heeftMededelingen = !isGangMode && mededelingen.length > 0;
+            const heeftMededelingen = isLerarenkamer && mededelingen.length > 0;
             const heeftVerjaardagen = vjVandaag.length > 0;
 
             // Lerarenkamer grootte voor namen
