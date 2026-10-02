@@ -15,7 +15,7 @@ Deze branch is gemaakt vanaf `main` om de bevindingen van de FG te verhelpen zon
 
 1. Firebase Authentication verplicht voor personeelsfuncties.
 2. Toegang wordt via Firebase Authentication en expliciete rollen geregeld; de loginprovider voor medewerkers wordt tijdens de migratie gekozen.
-3. Admin is het persoonlijke account `meesteryoeran@gmail.com`; adminrechten worden door Firestore Rules afgedwongen en niet door de UI.
+3. Adminrechten worden via een expliciete `admin`-rol door Firestore Rules afgedwongen en niet door de UI. Persoonlijke accountgegevens staan niet in de repository.
 4. Medewerkersdata wordt geminimaliseerd zodat displays geen e-mailadressen hoeven op te halen.
 5. Aanwezigheid wordt omgezet van daghistorie naar alleen actuele status, tenzij Nissewijs bewust een bewaartermijn vaststelt.
 6. Verjaardagen worden uit de publieke GitHub-data gehaald en intern opgeslagen.
