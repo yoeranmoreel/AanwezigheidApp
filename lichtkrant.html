@@ -88,9 +88,6 @@
         const PLAATS = 'Spijkenisse';
         const WEER_REFRESH = 1800000;
         const NIEUWS_REFRESH = 3600000;
-        // Pas aan naar jouw GitHub raw URL:
-        const VERJAARDAGEN_URL = 'https://raw.githubusercontent.com/yoeranmoreel/AanwezigheidApp/main/verjaardagen.txt';
-
         // ====================================
         // MODE DETECTIE
         // ====================================
@@ -133,18 +130,15 @@
         async function fetchVerjaardagen() {
             if (!isLerarenkamer) return;
             try {
-                const res = await fetch(VERJAARDAGEN_URL + '?t=' + Date.now());
-                const text = await res.text();
-                verjaardagen = text.trim().split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0 && !line.startsWith('#'))
-                    .map(line => {
-                        const match = line.match(/^(\d{2})-(\d{2})\s+(.+)$/);
-                        if (!match) return null;
-                        return { dag: parseInt(match[1]), maand: parseInt(match[2]), naam: match[3].trim() };
-                    })
-                    .filter(Boolean);
-
+                const snapshot = await getDocs(collection(db, 'verjaardagen'));
+                verjaardagen = snapshot.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .filter(v =>
+                        Number.isInteger(v.dag) &&
+                        Number.isInteger(v.maand) &&
+                        typeof v.naam === 'string' &&
+                        v.naam.trim().length > 0
+                    );
                 render();
             } catch (e) {
                 console.warn('Verjaardagen niet geladen:', e);
