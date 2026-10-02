@@ -30,7 +30,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, setDoc, updateDoc, deleteDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // ====================================
         // FIREBASE CONFIG — vul jouw gegevens in
@@ -48,7 +48,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const ADMIN_EMAIL = 'y.moreel@nissewijs.nl';
+        const ADMIN_EMAIL = 'meesteryoeran@gmail.com';
 
         // ====================================
         // STATE
@@ -66,11 +66,15 @@
         // ====================================
         async function fetchData() {
             try {
-                const [medSnap, meddSnap] = await Promise.all([
+                const [medSnap, priveSnap, meddSnap] = await Promise.all([
                     getDocs(collection(db, 'medewerkers')),
+                    getDocs(collection(db, 'medewerkers_prive')),
                     getDocs(collection(db, 'mededelingen'))
                 ]);
-                medewerkers = medSnap.docs.map(d => ({ id: d.id, ...d.data() })).filter(m => m.naam);
+                const prive = new Map(priveSnap.docs.map(d => [d.id, d.data()]));
+                medewerkers = medSnap.docs
+                    .map(d => ({ id: d.id, ...d.data(), email: prive.get(d.id)?.email || '' }))
+                    .filter(m => m.naam);
                 mededelingen = meddSnap.docs.map(d => ({ id: d.id, ...d.data(), datum: d.data().datum?.toDate() }));
                 render();
             } catch (error) {
@@ -84,15 +88,19 @@
                 if (employee.id) {
                     await updateDoc(doc(db, 'medewerkers', employee.id), {
                         naam: employee.naam,
-                        email: employee.email,
                         zichtbaar: employee.zichtbaar
+                    });
+                    await setDoc(doc(db, 'medewerkers_prive', employee.id), {
+                        email: employee.email || ''
                     });
                     showMessage('success', 'Medewerker bijgewerkt');
                 } else {
-                    await addDoc(collection(db, 'medewerkers'), {
+                    const nieuw = await addDoc(collection(db, 'medewerkers'), {
                         naam: employee.naam,
-                        email: employee.email || '',
                         zichtbaar: employee.zichtbaar ?? true
+                    });
+                    await setDoc(doc(db, 'medewerkers_prive', nieuw.id), {
+                        email: employee.email || ''
                     });
                     showMessage('success', 'Medewerker toegevoegd');
                 }
@@ -107,7 +115,11 @@
         async function deleteEmployee(id) {
             if (!confirm('Weet je zeker dat je deze medewerker wilt verwijderen?')) return;
             try {
-                await deleteDoc(doc(db, 'medewerkers', id));
+                await Promise.all([
+                    deleteDoc(doc(db, 'medewerkers', id)),
+                    deleteDoc(doc(db, 'medewerkers_prive', id)),
+                    deleteDoc(doc(db, 'actuele_status', id))
+                ]);
                 showMessage('success', 'Medewerker verwijderd');
                 await fetchData();
             } catch (error) {
