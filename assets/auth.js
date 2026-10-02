@@ -32,31 +32,10 @@ export function createAuthContext(firebaseApp) {
     });
   }
 
-  function isAdmin(user) {
-    return Boolean(
-      user &&
-      typeof user.email === 'string' &&
-      user.email.toLowerCase() === 'meesteryoeran@gmail.com'
-    );
-  }
-
-  function requireAdmin() {
-    return requireUser().then((user) => {
-      if (!isAdmin(user)) {
-        const error = new Error('ADMIN_REQUIRED');
-        error.code = 'auth/admin-required';
-        throw error;
-      }
-      return user;
-    });
-  }
-
   return {
     auth,
     waitForUser,
     requireUser,
-    requireAdmin,
-    isAdmin,
     logout: () => signOut(auth)
   };
 }
