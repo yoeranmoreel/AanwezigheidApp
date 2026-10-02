@@ -7,7 +7,7 @@
 De applicatie wordt voorbereid op Firebase Authentication zonder nu een provider vast te leggen.
 
 - Alle interne Firestore-data vereist straks `request.auth != null`.
-- Admin is expliciet `meesteryoeran@gmail.com`.
+- Admin wordt via een expliciete `admin`-rol geautoriseerd; persoonlijke accountgegevens staan niet in de repository.
 - De admincontrole staat zowel in de frontend-helper als, doorslaggevend, in Firestore Security Rules.
 - De frontendcontrole is alleen UX; Firestore Rules vormen de beveiligingsgrens.
 - Een loginprovider wordt later gekoppeld zonder het autorisatiemodel opnieuw te bouwen.
