@@ -7,7 +7,7 @@ Toegestane rollen:
 - display-gang: algemene medewerkerslijst en actuele status lezen;
 - display-lerarenkamer: aanwezigheid plus mededelingen en verjaardagen lezen.
 
-Het persoonlijke adminaccount meesteryoeran@gmail.com wordt rechtstreeks door de Rules als admin herkend.
+De admin wordt uitsluitend via de `admin`-rol herkend. Concrete accountgegevens horen niet in de repository.
 
 De UID ontstaat pas nadat de identiteit in Firebase Authentication bestaat. Daarna krijgt rollen/{UID} uitsluitend een role-veld. Alleen de admin mag rol-documenten beheren.
 
