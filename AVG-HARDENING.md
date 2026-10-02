@@ -14,8 +14,8 @@ Deze branch is gemaakt vanaf `main` om de bevindingen van de FG te verhelpen zon
 ## Doelarchitectuur
 
 1. Firebase Authentication verplicht voor personeelsfuncties.
-2. Alleen accounts op `@nissewijs.nl` krijgen toegang.
-3. Adminrechten worden door Firestore Rules afgedwongen; niet door de UI.
+2. Toegang wordt via Firebase Authentication en expliciete rollen geregeld; de loginprovider voor medewerkers wordt tijdens de migratie gekozen.
+3. Admin is het persoonlijke account `meesteryoeran@gmail.com`; adminrechten worden door Firestore Rules afgedwongen en niet door de UI.
 4. Medewerkersdata wordt geminimaliseerd zodat displays geen e-mailadressen hoeven op te halen.
 5. Aanwezigheid wordt omgezet van daghistorie naar alleen actuele status, tenzij Nissewijs bewust een bewaartermijn vaststelt.
 6. Verjaardagen worden uit de publieke GitHub-data gehaald en intern opgeslagen.
@@ -31,5 +31,5 @@ Deze branch is gemaakt vanaf `main` om de bevindingen van de FG te verhelpen zon
 - Firestore database-regio.
 - Eigenaar/beheerders van het Firebase-project.
 - Of Google Analytics daadwerkelijk actief is.
-- Huidige productie-Security Rules.
+- Huidige productie-Security Rules zijn bevestigd als volledig openbaar (`allow read, write: if true`) en worden tijdens de weekendmigratie vervangen.
 - Verwijderen van persoonsgegevens uit Git-history vereist een aparte history rewrite en force-push; dit moet bewust worden gepland.
