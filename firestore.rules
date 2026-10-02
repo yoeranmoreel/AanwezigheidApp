@@ -13,50 +13,92 @@ service cloud.firestore {
         && request.auth.token.email == 'meesteryoeran@gmail.com';
     }
 
-    // Algemene medewerkerslijst. In een volgende migratiestap worden privévelden
-    // (zoals e-mail) uit deze collectie gehaald zodat displays ze nooit ontvangen.
-    match /medewerkers/{medewerkerId} {
-      allow read: if signedIn();
+    function roleDoc() {
+      return get(/databases/$(database)/documents/rollen/$(request.auth.uid));
+    }
+
+    function hasRole(roleName) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/rollen/$(request.auth.uid))
+        && roleDoc().data.role == roleName;
+    }
+
+    function isStaff() {
+      return hasRole('staff');
+    }
+
+    function isGangDisplay() {
+      return hasRole('display-gang');
+    }
+
+    function isTeacherRoomDisplay() {
+      return hasRole('display-lerarenkamer');
+    }
+
+    function mayReadPresence() {
+      return isAdmin() || isStaff() || isGangDisplay() || isTeacherRoomDisplay();
+    }
+
+    function mayReadInternalExtras() {
+      return isAdmin() || isStaff() || isTeacherRoomDisplay();
+    }
+
+    // Roltoekenning is nooit zelfservice. Alleen de admin kan rollen beheren.
+    match /rollen/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
       allow create, update, delete: if isAdmin();
     }
 
-    // Huidige productiecollectie. Tijdelijk alleen voor geauthenticeerde gebruikers.
-    // Wordt gemigreerd naar actuele_status zodat geen daghistorie nodig is.
-    match /aanwezigheid/{recordId} {
-      allow read, create, update: if signedIn();
-      allow delete: if isAdmin();
+    // Minimale algemene medewerkersdata: naam + zichtbaar.
+    match /medewerkers/{medewerkerId} {
+      allow read: if mayReadPresence();
+      allow create, update, delete: if isAdmin();
     }
 
-    // Nieuw doelmodel: één document per medewerker, uitsluitend actuele status.
-    // Geen tijdstip, datumlogboek of historie.
+    // Oude productiecollectie: na migratie niet meer nodig.
+    // Alleen admin kan hem tijdelijk lezen voor controle/migratie.
+    match /aanwezigheid/{recordId} {
+      allow read, delete: if isAdmin();
+      allow create, update: if false;
+    }
+
+    // Eén document per medewerker, uitsluitend actuele status.
     match /actuele_status/{medewerkerId} {
-      allow read: if signedIn();
-      allow create, update: if signedIn()
+      allow read: if mayReadPresence();
+      allow create, update: if (isAdmin() || isStaff())
         && request.resource.data.keys().hasOnly(['naam', 'status'])
         && request.resource.data.naam is string
         && request.resource.data.status in ['Aanwezig', 'Afwezig'];
       allow delete: if isAdmin();
     }
 
-    // Interne mededelingen: zichtbaar na authenticatie, beheer alleen door admin.
+    // Alleen interne rollen; gangdisplays krijgen deze collectie niet.
     match /mededelingen/{mededelingId} {
-      allow read: if signedIn();
+      allow read: if mayReadInternalExtras();
       allow create, update, delete: if isAdmin();
     }
 
-    // Verjaardagen worden later uit GitHub gemigreerd naar deze afgeschermde collectie.
-    // Alleen dag, maand en voornaam; geen geboortejaar.
+    // Alleen interne rollen; gangdisplays krijgen deze collectie niet.
     match /verjaardagen/{verjaardagId} {
-      allow read: if signedIn();
-      allow create, update, delete: if isAdmin();
+      allow read: if mayReadInternalExtras();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['naam', 'dag', 'maand'])
+        && request.resource.data.naam is string
+        && request.resource.data.dag is int
+        && request.resource.data.dag >= 1
+        && request.resource.data.dag <= 31
+        && request.resource.data.maand is int
+        && request.resource.data.maand >= 1
+        && request.resource.data.maand <= 12;
+      allow delete: if isAdmin();
     }
 
-    // Eventuele privé-medewerkersdata is uitsluitend voor beheer.
+    // E-mail en eventuele andere beheerdata is uitsluitend voor de admin.
     match /medewerkers_prive/{medewerkerId} {
       allow read, write: if isAdmin();
     }
 
-    // Default deny: nieuwe/ongekende collecties zijn nooit automatisch openbaar.
+    // Default deny.
     match /{document=**} {
       allow read, write: if false;
     }
