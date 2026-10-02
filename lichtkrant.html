@@ -63,7 +63,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, onSnapshot, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // ====================================
         // FIREBASE CONFIG — vul jouw gegevens in
@@ -195,19 +195,6 @@
 // ====================================
 async function init() {
 
-    const now = new Date();
-    const startVanDag = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate()
-    );
-
-    const eindeVanDag = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + 1
-    );
-
     // Medewerkers laden
     const medSnap = await getDocs(
         collection(db, 'medewerkers')
@@ -217,74 +204,45 @@ async function init() {
         .map(d => ({ id: d.id, ...d.data() }))
         .filter(m => m.naam);
 
-    // Mededelingen realtime
-    const mededelingenQuery = query(
-        collection(db, 'mededelingen'),
-        where('actief', '==', true)
-    );
+    // Mededelingen zijn uitsluitend onderdeel van de lerarenkamerweergave.
+    // Andere modes vragen deze collectie technisch niet op.
+    if (isLerarenkamer) {
+        const mededelingenQuery = query(
+            collection(db, 'mededelingen'),
+            where('actief', '==', true)
+        );
 
+        onSnapshot(
+            mededelingenQuery,
+            (snapshot) => {
+                mededelingen = snapshot.docs.map(d => ({
+                    id: d.id,
+                    ...d.data()
+                }));
+                if (!loading) render();
+            },
+            (error) => console.error('Mededelingen listener fout:', error)
+        );
+    }
+
+    // Alleen actuele status; geen datum/tijdstip of historische records.
     onSnapshot(
-        mededelingenQuery,
+        collection(db, 'actuele_status'),
         (snapshot) => {
-            mededelingen = snapshot.docs.map(d => ({
+            aanwezigheid = snapshot.docs.map(d => ({
                 id: d.id,
                 ...d.data()
             }));
 
-            if (!loading) {
-                render();
-            }
-        },
-        (error) => {
-            console.error(
-                'Mededelingen listener fout:',
-                error
-            );
-        }
-    );
-
-    // Aanwezigheid realtime
-    const aanwezigheidQuery = query(
-        collection(db, 'aanwezigheid'),
-        where(
-            'datum',
-            '>=',
-            Timestamp.fromDate(startVanDag)
-        ),
-        where(
-            'datum',
-            '<',
-            Timestamp.fromDate(eindeVanDag)
-        )
-    );
-
-    onSnapshot(
-        aanwezigheidQuery,
-        (snapshot) => {
-            aanwezigheid = snapshot.docs.map(d => ({
-                id: d.id,
-                ...d.data(),
-                tijdstip: d.data().tijdstip?.toDate()
-            }));
-
             loading = false;
 
-            if (
-                document.getElementById(
-                    'aanwezigheid-lijst'
-                )
-            ) {
+            if (document.getElementById('aanwezigheid-lijst')) {
                 updateAanwezigheidLijst();
             } else {
                 render();
             }
         },
-        (error) => {
-            console.error(
-                'Aanwezigheid listener fout:',
-                error
-            );
-        }
+        (error) => console.error('Aanwezigheid listener fout:', error)
     );
 }
 
@@ -295,9 +253,7 @@ async function init() {
                 if (statusEntry && statusEntry.status === 'Aanwezig') {
                     present.push({
                         naam: medewerker.naam,
-                        tijd: statusEntry.tijdstip
-                            ? statusEntry.tijdstip.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
-                            : null
+                        tijd: null
                     });
                 }
             });
