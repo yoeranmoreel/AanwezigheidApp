@@ -7,38 +7,56 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isNissewijsUser() {
+    function isAdmin() {
       return signedIn()
         && request.auth.token.email is string
-        && request.auth.token.email.matches('.*@nissewijs\\.nl$');
+        && request.auth.token.email == 'meesteryoeran@gmail.com';
     }
 
-    function isAdmin() {
-      return isNissewijsUser()
-        && request.auth.token.email == 'y.moreel@nissewijs.nl';
-    }
-
-    // Medewerkersgegevens bevatten persoonsgegevens.
-    // Alleen ingelogde Nissewijs-gebruikers mogen lezen; alleen admin mag beheren.
+    // Algemene medewerkerslijst. In een volgende migratiestap worden privévelden
+    // (zoals e-mail) uit deze collectie gehaald zodat displays ze nooit ontvangen.
     match /medewerkers/{medewerkerId} {
-      allow read: if isNissewijsUser();
+      allow read: if signedIn();
       allow create, update, delete: if isAdmin();
     }
 
-    // Aanwezigheid is alleen beschikbaar voor ingelogde Nissewijs-gebruikers.
-    // Historische records worden in de volgende migratiestap vervangen door actuele status.
+    // Huidige productiecollectie. Tijdelijk alleen voor geauthenticeerde gebruikers.
+    // Wordt gemigreerd naar actuele_status zodat geen daghistorie nodig is.
     match /aanwezigheid/{recordId} {
-      allow read, create, update: if isNissewijsUser();
+      allow read, create, update: if signedIn();
       allow delete: if isAdmin();
     }
 
-    // Mededelingen zijn intern; beheer alleen door admin.
+    // Nieuw doelmodel: één document per medewerker, uitsluitend actuele status.
+    // Geen tijdstip, datumlogboek of historie.
+    match /actuele_status/{medewerkerId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.keys().hasOnly(['naam', 'status'])
+        && request.resource.data.naam is string
+        && request.resource.data.status in ['Aanwezig', 'Afwezig'];
+      allow delete: if isAdmin();
+    }
+
+    // Interne mededelingen: zichtbaar na authenticatie, beheer alleen door admin.
     match /mededelingen/{mededelingId} {
-      allow read: if isNissewijsUser();
+      allow read: if signedIn();
       allow create, update, delete: if isAdmin();
     }
 
-    // Default deny: toekomstige collecties zijn niet per ongeluk openbaar.
+    // Verjaardagen worden later uit GitHub gemigreerd naar deze afgeschermde collectie.
+    // Alleen dag, maand en voornaam; geen geboortejaar.
+    match /verjaardagen/{verjaardagId} {
+      allow read: if signedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Eventuele privé-medewerkersdata is uitsluitend voor beheer.
+    match /medewerkers_prive/{medewerkerId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny: nieuwe/ongekende collecties zijn nooit automatisch openbaar.
     match /{document=**} {
       allow read, write: if false;
     }
