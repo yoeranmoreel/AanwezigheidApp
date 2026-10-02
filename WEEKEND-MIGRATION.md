@@ -12,7 +12,8 @@ Dit draaiboek is bedoeld voor de overgang van de huidige productieversie naar de
 - [x] Mededelingen alleen opvragen in lerarenkamer-mode.
 - [x] Verjaardagen in V2 uit beveiligde Firestore-collectie lezen.
 - [x] Default-deny Security Rules voorbereid.
-- [ ] Definitieve display-authenticatie configureren.
+- [x] Displayrollen en autorisatiematrix technisch voorbereid.
+- [ ] Definitieve display-authenticatie in Firebase configureren.
 - [ ] Definitieve medewerker-loginprovider configureren.
 
 ## Vrijdagavond — gecontroleerde omschakeling
@@ -30,6 +31,8 @@ Dit draaiboek is bedoeld voor de overgang van de huidige productieversie naar de
 9. Publiceer pas daarna de beveiligde Firestore Rules.
 
 ## Security-test na Rules-publicatie
+
+Gebruik `SECURITY-REGRESSION-TEST.md` als vaste voor/na-test. Dit is de regressietest van de directe Firestore-toegang die bij de oorspronkelijke beoordeling gegevens opleverde.
 
 - [ ] Uitgelogd: `medewerkers` niet rechtstreeks leesbaar.
 - [ ] Uitgelogd: `actuele_status` niet rechtstreeks leesbaar.
