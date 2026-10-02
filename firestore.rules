@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isNissewijsUser() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.matches('.*@nissewijs\\.nl$');
+    }
+
+    function isAdmin() {
+      return isNissewijsUser()
+        && request.auth.token.email == 'y.moreel@nissewijs.nl';
+    }
+
+    // Medewerkersgegevens bevatten persoonsgegevens.
+    // Alleen ingelogde Nissewijs-gebruikers mogen lezen; alleen admin mag beheren.
+    match /medewerkers/{medewerkerId} {
+      allow read: if isNissewijsUser();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Aanwezigheid is alleen beschikbaar voor ingelogde Nissewijs-gebruikers.
+    // Historische records worden in de volgende migratiestap vervangen door actuele status.
+    match /aanwezigheid/{recordId} {
+      allow read, create, update: if isNissewijsUser();
+      allow delete: if isAdmin();
+    }
+
+    // Mededelingen zijn intern; beheer alleen door admin.
+    match /mededelingen/{mededelingId} {
+      allow read: if isNissewijsUser();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Default deny: toekomstige collecties zijn niet per ongeluk openbaar.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
