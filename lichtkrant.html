@@ -589,7 +589,7 @@ function scheduleReloads() {
 
 scheduleReloads();
 
-if (!isGangMode) {
+if (isLerarenkamer) {
     fetchWeer();
     setInterval(fetchWeer, WEER_REFRESH);
     fetchNieuws();
