@@ -6,7 +6,7 @@ Dit draaiboek is bedoeld voor de overgang van de huidige productieversie naar de
 
 - [x] V2-branch los van main.
 - [x] Provider-neutrale Authentication-helper.
-- [x] Adminidentiteit: `meesteryoeran@gmail.com`.
+- [x] Adminrol technisch voorbereid; concrete adminidentiteit blijft buiten de repository.
 - [x] Nieuw `actuele_status` model zonder datum/tijd/historie.
 - [x] E-mail afgesplitst naar `medewerkers_prive`.
 - [x] Mededelingen alleen opvragen in lerarenkamer-mode.
@@ -20,7 +20,7 @@ Dit draaiboek is bedoeld voor de overgang van de huidige productieversie naar de
 
 1. Noteer/exporteer voor de zekerheid de huidige Firestore-data.
 2. Activeer de gekozen Firebase Authentication-provider(s).
-3. Maak/test het adminaccount `meesteryoeran@gmail.com`.
+3. Maak/test de vooraf afgesproken adminidentiteit en koppel de `admin`-rol.
 4. Maak de benodigde display-identiteit(en) aan; geen wachtwoorden of tokens in GitHub opslaan.
 5. Maak `verjaardagen` in Firestore en migreer alleen `naam`, `dag`, `maand`.
 6. Migreer medewerkers:
