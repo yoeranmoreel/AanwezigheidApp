@@ -58,7 +58,7 @@ body{
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, onSnapshot, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ====================================
 // FIREBASE CONFIG — vul jouw gegevens in
@@ -87,24 +87,15 @@ let loading = true;
 // INIT
 // ====================================
 async function init(){
-    // Medewerkers zijn statisch — eenmalig ophalen is voldoende
+    // Alleen algemene medewerkersgegevens; privévelden worden in de migratie
+    // naar medewerkers_prive verplaatst.
     const snapshot = await getDocs(collection(db, 'medewerkers'));
     medewerkers = snapshot.docs
         .map(d => ({ id: d.id, ...d.data() }))
         .filter(m => m.naam);
 
-    // Aanwezigheid via onSnapshot — realtime, geen polling
-    const now = new Date();
-    const startVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const eindeVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-
-    const q = query(
-        collection(db, 'aanwezigheid'),
-        where('datum', '>=', Timestamp.fromDate(startVanDag)),
-        where('datum', '<', Timestamp.fromDate(eindeVanDag))
-    );
-
-    onSnapshot(q, (snapshot) => {
+    // Eén actueel document per medewerker: geen datum/tijdstip en geen historie.
+    onSnapshot(collection(db, 'actuele_status'), (snapshot) => {
         statusMap = {};
         snapshot.docs.forEach(d => {
             const data = d.data();
@@ -122,40 +113,22 @@ async function toggleStatus(naam){
     const huidigeStatus = statusMap[naam] || 'Afwezig';
     const nieuweStatus = huidigeStatus === 'Aanwezig' ? 'Afwezig' : 'Aanwezig';
 
-    // Optimistisch updaten zodat de tegel direct reageert
     statusMap[naam] = nieuweStatus;
     render();
 
     try {
-        const now = new Date();
-        const startVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const eindeVanDag = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        const medewerker = medewerkers.find(m => m.naam === naam);
+        if (!medewerker) throw new Error('Medewerker niet gevonden');
 
-        const q = query(
-            collection(db, 'aanwezigheid'),
-            where('naam', '==', naam),
-            where('datum', '>=', Timestamp.fromDate(startVanDag)),
-            where('datum', '<', Timestamp.fromDate(eindeVanDag))
-        );
-        const bestaand = await getDocs(q);
-
-        if (!bestaand.empty) {
-            await updateDoc(bestaand.docs[0].ref, {
-                status: nieuweStatus,
-                tijdstip: Timestamp.fromDate(now)
-            });
-        } else {
-            await addDoc(collection(db, 'aanwezigheid'), {
-                naam,
-                datum: Timestamp.fromDate(now),
-                status: nieuweStatus,
-                tijdstip: Timestamp.fromDate(now)
-            });
-        }
+        // Deterministisch document-ID: iedere wijziging overschrijft dezelfde status.
+        await setDoc(doc(db, 'actuele_status', medewerker.id), {
+            naam,
+            status: nieuweStatus
+        });
     } catch(error) {
-        // Terugdraaien bij fout
         statusMap[naam] = huidigeStatus;
         render();
+        console.error('Status wijzigen mislukt:', error);
     }
 }
 
