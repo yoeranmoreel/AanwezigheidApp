@@ -7,96 +7,54 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function roleDoc() {
-      return get(/databases/$(database)/documents/rollen/$(request.auth.uid));
-    }
-
-    function hasRole(roleName) {
-      return signedIn()
-        && exists(/databases/$(database)/documents/rollen/$(request.auth.uid))
-        && roleDoc().data.role == roleName;
+    function account() {
+      return get(/databases/$(database)/documents/accounts/$(request.auth.uid)).data;
     }
 
     function isAdmin() {
-      return hasRole('admin');
+      return signedIn() && account().role == 'admin';
     }
 
     function isStaff() {
-      return hasRole('staff');
+      return signedIn() &&
+        (account().role == 'staff' || account().role == 'admin');
     }
 
-    function isGangDisplay() {
-      return hasRole('display-gang');
+    function isDisplay() {
+      return signedIn() && account().role == 'display';
     }
 
-    function isTeacherRoomDisplay() {
-      return hasRole('display-lerarenkamer');
+    function isLerarenkamerDisplay() {
+      return isDisplay() && account().displayType == 'lerarenkamer';
     }
 
-    function mayReadPresence() {
-      return isAdmin() || isStaff() || isGangDisplay() || isTeacherRoomDisplay();
-    }
-
-    function mayReadInternalExtras() {
-      return isAdmin() || isStaff() || isTeacherRoomDisplay();
-    }
-
-    // Roltoekenning is nooit zelfservice. Alleen de admin kan rollen beheren.
-    match /rollen/{uid} {
-      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+    match /accounts/{uid} {
+      allow read: if signedIn();
       allow create, update, delete: if isAdmin();
     }
 
-    // Minimale algemene medewerkersdata: naam + zichtbaar.
-    match /medewerkers/{medewerkerId} {
-      allow read: if mayReadPresence();
-      allow create, update, delete: if isAdmin();
-    }
+    match /actuele_status/{uid} {
+      allow read: if signedIn();
 
-    // Oude productiecollectie: na migratie niet meer nodig.
-    // Alleen admin kan hem tijdelijk lezen voor controle/migratie.
-    match /aanwezigheid/{recordId} {
-      allow read, delete: if isAdmin();
-      allow create, update: if false;
-    }
+      allow create, update: if isAdmin() ||
+        (isStaff() &&
+         request.auth.uid == uid &&
+         request.resource.data.keys().hasOnly(['aanwezig']) &&
+         request.resource.data.aanwezig is bool);
 
-    // Eén document per medewerker, uitsluitend actuele status.
-    match /actuele_status/{medewerkerId} {
-      allow read: if mayReadPresence();
-      allow create, update: if (isAdmin() || isStaff())
-        && request.resource.data.keys().hasOnly(['naam', 'status'])
-        && request.resource.data.naam is string
-        && request.resource.data.status in ['Aanwezig', 'Afwezig'];
       allow delete: if isAdmin();
     }
 
-    // Alleen interne rollen; gangdisplays krijgen deze collectie niet.
-    match /mededelingen/{mededelingId} {
-      allow read: if mayReadInternalExtras();
-      allow create, update, delete: if isAdmin();
+    match /mededelingen/{id} {
+      allow read: if isStaff() || isLerarenkamerDisplay();
+      allow write: if isAdmin();
     }
 
-    // Alleen interne rollen; gangdisplays krijgen deze collectie niet.
-    match /verjaardagen/{verjaardagId} {
-      allow read: if mayReadInternalExtras();
-      allow create, update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['naam', 'dag', 'maand'])
-        && request.resource.data.naam is string
-        && request.resource.data.dag is int
-        && request.resource.data.dag >= 1
-        && request.resource.data.dag <= 31
-        && request.resource.data.maand is int
-        && request.resource.data.maand >= 1
-        && request.resource.data.maand <= 12;
-      allow delete: if isAdmin();
+    match /verjaardagen/{id} {
+      allow read: if isStaff() || isLerarenkamerDisplay();
+      allow write: if isAdmin();
     }
 
-    // E-mail en eventuele andere beheerdata is uitsluitend voor de admin.
-    match /medewerkers_prive/{medewerkerId} {
-      allow read, write: if isAdmin();
-    }
-
-    // Default deny.
     match /{document=**} {
       allow read, write: if false;
     }
