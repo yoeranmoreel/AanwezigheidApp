@@ -603,15 +603,15 @@
 
         function parseBirthdays(text) {
             const records = [], errors = [];
-            const lines = text.replace(/^\\uFEFF/, '').split(/\\r?\\n/);
+            const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/);
             lines.forEach((line, i) => {
                 const s = line.trim();
                 if (!s || s.startsWith('#')) return;
-                let match = s.match(/^(\\d{1,2})[.\\/-](\\d{1,2})(?:[.\\/-]\\d{2,4})?\\s*[,;|\\t ]+\\s*(.+)$/);
+                let match = s.match(/^(\d{1,2})[.\/-](\d{1,2})(?:[.\/-]\d{2,4})?\s*[,;|\t ]+\s*(.+)$/);
                 let naam, dag, maand;
                 if (match) { dag = Number(match[1]); maand = Number(match[2]); naam = match[3].trim(); }
                 else {
-                    match = s.match(/^(.+?)\\s*[,;|\\t]+\\s*(\\d{1,2})[.\\/-](\\d{1,2})(?:[.\\/-]\\d{2,4})?$/);
+                    match = s.match(/^(.+?)\s*[,;|\t]+\s*(\d{1,2})[.\/-](\d{1,2})(?:[.\/-]\d{2,4})?$/);
                     if (match) { naam = match[1].trim(); dag = Number(match[2]); maand = Number(match[3]); }
                 }
                 if (!match || !validBirthday(naam, dag, maand)) { errors.push(i + 1); return; }
