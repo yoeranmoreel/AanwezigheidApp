@@ -662,7 +662,7 @@
             const maanden = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
             const datum = v => String(v.dag).padStart(2,'0') + '-' + String(v.maand).padStart(2,'0');
             return `<div class="space-y-6">
-              <section class="glass-card rounded-2xl p-5"><h2 class="text-xl font-bold mb-3">🎂 Verjaardagen beheren</h2>
+              <section id="birthday-editor" class="glass-card rounded-2xl p-5"><h2 class="text-xl font-bold mb-3">🎂 ${editingBirthday ? 'Verjaardag wijzigen' : 'Verjaardagen beheren'}</h2>
                 <p class="text-slate-300 text-sm mb-4">Alleen voornaam, dag en maand worden opgeslagen in Firebase.</p>
                 <div class="grid sm:grid-cols-4 gap-3">
                   <input id="birthday-name" placeholder="Voornaam" value="${escape(b.naam)}" maxlength="80" class="glass-card rounded-xl px-3 py-3 text-white">
@@ -762,7 +762,17 @@
             toggleActive: (ann) => toggleAnnouncementActive(JSON.parse(ann)),
             saveBirthday,
             removeBirthday,
-            editBirthday: id => { editingBirthday = verjaardagen.find(v=>v.id===id) || null; render(); },
+            editBirthday: id => {
+                editingBirthday = verjaardagen.find(v => v.id === id) || null;
+                if (!editingBirthday) { alert('Verjaardag niet gevonden. Vernieuw de pagina.'); return; }
+                render();
+                const input = document.getElementById('birthday-name');
+                if (input) {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    input.focus({ preventScroll: true });
+                    input.select();
+                }
+            },
             cancelBirthday: () => { editingBirthday = null; render(); },
             loadBirthdayFile,
             importBirthdays
