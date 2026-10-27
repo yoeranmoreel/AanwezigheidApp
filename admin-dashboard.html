@@ -659,6 +659,8 @@
             const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
             const b = editingBirthday || {naam:'', dag:'', maand:''};
             const rows = [...verjaardagen].sort((a,z) => a.maand-z.maand || a.dag-z.dag || a.naam.localeCompare(z.naam,'nl'));
+            const maanden = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+            const datum = v => String(v.dag).padStart(2,'0') + '-' + String(v.maand).padStart(2,'0');
             return `<div class="space-y-6">
               <section class="glass-card rounded-2xl p-5"><h2 class="text-xl font-bold mb-3">🎂 Verjaardagen beheren</h2>
                 <p class="text-slate-300 text-sm mb-4">Alleen voornaam, dag en maand worden opgeslagen in Firebase.</p>
@@ -674,12 +676,12 @@
                 <p class="text-slate-300 text-sm mb-3">Gebruik per regel bijvoorbeeld <code>12-04; Emma</code> of <code>Emma; 12-04</code>. Een geboortejaar in het bestand wordt genegeerd.</p>
                 <input type="file" accept=".txt,text/plain" onchange="window._adminFns.loadBirthdayFile(this)" class="block w-full text-sm mb-4">
                 ${birthdayPreview.length ? `<p class="mb-2 font-semibold">${birthdayPreview.length} regels gevonden (voorbeeld):</p>
-                <div class="max-h-48 overflow-y-auto text-sm mb-3">${birthdayPreview.slice(0,100).map(v=>`<div>${escape(v.naam)} — ${v.dag}-${v.maand}</div>`).join('')}</div>
+                <div class="max-h-48 overflow-y-auto text-sm mb-3">${birthdayPreview.slice(0,100).map(v=>`<div class="grid grid-cols-[minmax(0,1fr)_6rem] gap-3 border-b border-white/10 py-1"><span>${escape(v.naam)}</span><span class="tabular-nums">${datum(v)}</span></div>`).join('')}</div>
                 ${birthdayPreview.length>100 ? '<p class="text-xs mb-3">Alleen de eerste 100 regels worden getoond.</p>' : ''}
                 <button onclick="window._adminFns.importBirthdays()" class="bg-green-700 rounded-xl px-4 py-3 font-semibold">Gecontroleerde verjaardagen importeren</button>` : '<p class="text-slate-400 text-sm">Nog geen bestand geselecteerd.</p>'}
               </section>
               <section class="glass-card rounded-2xl p-5"><h3 class="text-lg font-bold mb-3">Opgeslagen verjaardagen (${rows.length})</h3>
-                <div class="space-y-2">${rows.map(v=>`<div class="flex items-center justify-between gap-3 border-b border-white/10 py-2"><span>${escape(v.naam)} — ${v.dag}-${v.maand}</span><span class="flex gap-3"><button class="text-blue-300 underline" onclick="window._adminFns.editBirthday('${v.id}')">Wijzig</button><button class="text-red-300 underline" onclick="window._adminFns.removeBirthday('${v.id}')">Verwijder</button></span></div>`).join('') || '<p class="text-slate-400">Nog geen verjaardagen.</p>'}</div>
+                <div class="overflow-x-auto"><table class="w-full min-w-[340px] text-left text-sm border-collapse"><thead><tr class="text-slate-300 border-b border-white/20"><th scope="col" class="px-3 py-3 font-semibold">Naam</th><th scope="col" class="px-3 py-3 font-semibold w-28">Datum</th><th scope="col" class="px-3 py-3 font-semibold w-36 text-right">Acties</th></tr></thead><tbody>${maanden.map((maand, i) => { const lijst = rows.filter(v => v.maand === i + 1); return `<tr class="bg-purple-500/15"><th colspan="3" scope="rowgroup" class="px-3 py-3 text-purple-200 font-bold">${maand} ${lijst.length ? '('+lijst.length+')' : ''}</th></tr>${lijst.map(v => `<tr class="border-b border-white/10 hover:bg-white/5"><td class="px-3 py-3 break-words">${escape(v.naam)}</td><td class="px-3 py-3 tabular-nums whitespace-nowrap">${datum(v)}</td><td class="px-3 py-3 text-right whitespace-nowrap"><button class="text-blue-300 underline mr-3" onclick="window._adminFns.editBirthday('${v.id}')">Wijzig</button><button class="text-red-300 underline" onclick="window._adminFns.removeBirthday('${v.id}')">Verwijder</button></td></tr>`).join('')}`; }).join('')}</tbody></table></div>
               </section></div>`;
         }
 
