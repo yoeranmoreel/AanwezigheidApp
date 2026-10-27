@@ -697,16 +697,17 @@
 
             },
 
-            editEmployee: (emp) => {
-
-                editingEmployee = emp
-
-                    ? JSON.parse(emp)
-
+            editEmployee: (id) => {
+                editingEmployee = id
+                    ? medewerkers.find(m => m.id === id) || null
                     : { id: null, displayName: '', functie: '', role: 'staff', zichtbaar: true };
-
+                if (!editingEmployee) { alert('Medewerker niet gevonden. Vernieuw de pagina.'); return; }
                 render();
-
+                const input = document.getElementById('emp-displayName');
+                if (input) {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    input.focus({ preventScroll: true });
+                }
             },
 
             cancelEmployee: () => { editingEmployee = null; render(); },
@@ -733,7 +734,7 @@
 
             deleteEmployee,
 
-            toggleVisibility: (emp) => toggleEmployeeVisibility(JSON.parse(emp)),
+            toggleVisibility: (id) => { const emp = medewerkers.find(m => m.id === id); if (emp) toggleEmployeeVisibility(emp); },
 
             editAnnouncement: (ann) => { editingAnnouncement = ann ? JSON.parse(ann) : { titel: '', bericht: '', prioriteit: 'Normaal', actief: true }; render(); },
 
@@ -1312,7 +1313,7 @@
 
                                         <button
 
-                                            onclick="window._adminFns.toggleVisibility('${JSON.stringify(emp).replace(/'/g, "\\\\\\\\'").replace(/"/g, '"')}')"
+                                            onclick="window._adminFns.toggleVisibility('${emp.id}')"
 
                                             class="px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition text-xs sm:text-sm ${emp.zichtbaar ? 'bg-green-500/20 text-green-300 border border-green-500/30 hover:bg-green-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30 hover:bg-gray-500/30'}"
 
@@ -1330,7 +1331,7 @@
 
                                             <button
 
-                                                onclick="window._adminFns.editEmployee('${JSON.stringify(emp).replace(/'/g, "\\\\\\\\'").replace(/"/g, '"')}')"
+                                                onclick="window._adminFns.editEmployee('${emp.id}')"
 
                                                 class="px-2 sm:px-4 py-1.5 sm:py-2 text-blue-400 bg-blue-500/20 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition text-xs sm:text-sm"
 
