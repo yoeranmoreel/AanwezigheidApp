@@ -28,7 +28,7 @@ async function main() {
   admin.initializeApp({credential: admin.credential.cert(credentials), projectId: 'aanwezigheid-app'});
   const db = admin.firestore();
   const snap = await db.collection('actuele_status').where('aanwezig', '==', true).get();
-  console.log(`Date (Amsterdam): ${dayKey}; mode: ${dryRun ? 'DRY RUN' : 'LIVE'}; currently present: ${snap.size}`);
+  console.log(`Date (Amsterdam): ${dayKey}; mode: ${dryRun ? 'DRY RUN' : 'LIVE'}; Firestore query succeeded.`);
   if (dryRun || snap.empty) return;
 
   let changed = 0;
@@ -40,7 +40,7 @@ async function main() {
     await batch.commit();
     changed += Math.min(400, snap.docs.length - i);
   }
-  console.log(`Reset completed: ${changed} people set to absent.`);
+  console.log('Reset completed successfully.');
 }
 
 main().catch(error => { console.error('Reset failed:', error.message); process.exitCode = 1; });
