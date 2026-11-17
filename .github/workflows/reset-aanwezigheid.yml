@@ -3,11 +3,9 @@ name: Reset aanwezigheid (18:00 NL)
 on:
   schedule:
     # GitHub cron uses UTC. Both slots cover Dutch summer/winter time.
-    # The script checks the local Dutch hour before changing anything.
+    # Live reset only between 18:00 and midnight Dutch time; no morning catch-up.
     - cron: '10 16 * * *'
     - cron: '10 17 * * *'
-    # Backup for delayed/missed evening runs; stale records only, never new check-ins.
-    - cron: '20 5 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
