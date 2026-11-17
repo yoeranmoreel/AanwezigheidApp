@@ -10,10 +10,10 @@ const hour = Number(new Intl.DateTimeFormat('en-GB', {
 }).format(new Date()));
 
 async function main() {
-  // Only perform live resets during the same evening.
+  // Only perform live resets between 18:00 and 03:00 Amsterdam time.
   // Never use Firestore timestamps or infer when an employee checked in.
-  if (!dryRun && (hour < 18 || hour >= 24)) {
-    console.log('Outside evening reset window (18:00-23:59 NL); no changes.');
+  if (!dryRun && hour >= 3 && hour < 18) {
+    console.log('Outside reset window (18:00-03:00 NL); no changes.');
     return;
   }
 
